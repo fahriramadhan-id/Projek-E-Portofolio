@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Model Partikel - Wujud Zat</title>
+    
+    <!-- Memuat Matter.js untuk mesin fisika 2D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --panel-bg: #ffffff;
+            --text-main: #333333;
+            --solid-color: #3498db;
+            --liquid-color: #9b59b6;
+            --gas-color: #e74c3c;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-main);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin-top: 20px;
+            background-color: var(--panel-bg);
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: #2c3e50;
+        }
+
+        .status-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #e8ecef;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .controls label {
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        input[type=range] {
+            flex-grow: 1;
+            height: 8px;
+            border-radius: 4px;
+            outline: none;
+            -webkit-appearance: none;
+            background: linear-gradient(to right, #3498db, #9b59b6, #e74c3c);
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid #333;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 400px;
+            background-color: #1a1a2e;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .instructions {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Simulasi Model Partikel</h1>
+        
+        <div class="status-panel">
+            <span>Suhu: <span id="temp-display">0</span>°C</span>
+            <span>Wujud Zat: <span id="state-display" style="color: var(--solid-color);">Padat</span></span>
+        </div>
+
+        <div class="controls">
+            <label>Dingin</label>
+            <input type="range" id="temp-slider" min="0" max="100" value="0">
+            <label>Panas</label>
+        </div>
+
+        <div id="canvas-container">
+            <!-- Kanvas Matter.js akan dimuat di sini -->
+        </div>
+
+        <p class="instructions">Geser pengatur suhu ke kanan atau ke kiri untuk mengamati perubahan pergerakan dan jarak antar partikel.</p>
+    </div>
+
+    <script>
+        // Alias untuk Matter.js
+        const Engine = Matter.Engine,
+              Render = Matter.Render,
+              Runner = Matter.Runner,
+              Bodies = Matter.Bodies,
+              Composite = Matter.Composite,
+              Events = Matter.Events,
+              Body = Matter.Body,
+              Vector = Matter.Vector;
+
+        // Mendapatkan elemen DOM
+        const container = document.getElementById('canvas-container');
+        const tempSlider = document.getElementById('temp-slider');
+        const tempDisplay = document.getElementById('temp-display');
+        const stateDisplay = document.getElementById('state-display');
+
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+
+        const engine = Engine.create();
+        const world = engine.world;
+
+        const render = Render.create({
+            element: container,
+            engine: engine,
+            options: {
+                width: width,
+                height: height,
+                background: 'transparent',
+                wireframes: false
+            }
+        });
+
+        // Membuat dinding pembatas
+        const wallOptions = { isStatic: true, render: { fillStyle: '#4a4e69' } };
+        const ground = Bodies.rectangle(width / 2, height + 25, width, 50, wallOptions);
+        const leftWall = Bodies.rectangle(-25, height / 2, 50, height, wallOptions);
+        const rightWall = Bodies.rectangle(width + 25, height / 2, 50, height, wallOptions);
+        const ceiling = Bodies.rectangle(width / 2, -25, width, 50, wallOptions);
+        
+        Composite.add(world, [ground, leftWall, rightWall, ceiling]);
+
+        const particles = [];
+        const cols = 12;
+        const rows = 8;
+        const particleRadius = 10;
+        const spacing = 22;
+        
+        // Titik awal susunan partikel agar berada di tengah bawah
+        const startX = (width - (cols * spacing)) / 2;
+        const startY = height - (rows * spacing) - 10;
+
+        for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < cols; j++) {
+                const x = startX + j * spacing;
+                const y = startY + i * spacing;
+                
+                const particle = Bodies.circle(x, y, particleRadius, {
+                    restitution: 0.5,
+                    friction: 0.1,
+                    frictionAir: 0.05,
+                    render: { fillStyle: '#3498db' }
+                });
+                
+                // Menyimpan posisi 'rumah' untuk wujud padat
+                particle.homeX = x;
+                particle.homeY = y;
+                
+                particles.push(particle);
+            }
+        }
+        Composite.add(world, particles);
+
+        // Menjalankan mesin fisika
+        Render.run(render);
+        const runner = Runner.create();
+        Runner.run(runner, engine);
+
+        Events.on(engine, 'beforeUpdate', function() {
+            const temp = parseInt(tempSlider.value);
+            
+            // Tentukan status dan perbarui UI
+            let currentState = 'Padat';
+            let particleColor = '#3498db';
+            
+            if (temp > 66) {
+                currentState = 'Gas';
+                particleColor = '#e74c3c'; // Merah
+            } else if (temp > 33) {
+                currentState = 'Cair';
+                particleColor = '#9b59b6'; // Ungu
+            }
+
+            tempDisplay.innerText = temp;
+            stateDisplay.innerText = currentState;
+            stateDisplay.style.color = particleColor;
+
+            // Logika Fisika untuk setiap partikel
+            particles.forEach(p => {
+                // Update warna partikel
+                p.render.fillStyle = particleColor;
+
+                // --- PENCEGAHAN ERROR MATTER.JS ---
+                // Membatasi kecepatan maksimum partikel agar posisi tidak meledak menjadi NaN
+                const maxSpeed = 15;
+                const speed = Math.sqrt(p.velocity.x * p.velocity.x + p.velocity.y * p.velocity.y);
+                if (speed > maxSpeed) {
+                    const ratio = maxSpeed / speed;
+                    Body.setVelocity(p, {
+                        x: p.velocity.x * ratio,
+                        y: p.velocity.y * ratio
+                    });
+                }
+
+                if (currentState === 'Padat') {
+                    // Wujud PADAT: Partikel ditarik kuat ke posisi awal, getaran kecil
+                    engine.gravity.y = 0; 
+                    p.frictionAir = 0.2;
+                    p.restitution = 0.1;
+
+                    // Gaya pegas (Spring) ke posisi awal
+                    const dx = p.homeX - p.position.x;
+                    const dy = p.homeY - p.position.y;
+                    
+                    // Batasi jarak tarikan maksimal agar gayanya tidak meledak saat pindah drastis dari Gas ke Padat
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    const maxPullDistance = 50;
+                    const safeDx = distance > 0 ? (dx / distance) * Math.min(distance, maxPullDistance) : 0;
+                    const safeDy = distance > 0 ? (dy / distance) * Math.min(distance, maxPullDistance) : 0;
+                    
+                    const springStiffness = 0.002;
+                    
+                    Body.applyForce(p, p.position, {
+                        x: safeDx * springStiffness,
+                        y: safeDy * springStiffness
+                    });
+
+                    // Getaran kecil berdasarkan suhu
+                    const vibration = (temp / 100) * 0.002;
+                    Body.applyForce(p, p.position, {
+                        x: (Math.random() - 0.5) * vibration,
+                        y: (Math.random() - 0.5) * vibration
+                    });
+
+                } else if (currentState === 'Cair') {
+                    // Wujud CAIR: Ada gravitasi (berada di dasar), bergerak lebih bebas
+                    engine.gravity.y = 1;
+                    p.frictionAir = 0.05;
+                    p.restitution = 0.4; // Sedikit memantul
+
+                    // Gaya kinetik acak (mengalir)
+                    const flowForce = 0.001 + (temp / 100) * 0.002;
+                    Body.applyForce(p, p.position, {
+                        x: (Math.random() - 0.5) * flowForce,
+                        y: (Math.random() - 0.5) * flowForce
+                    });
+
+                } else {
+                    // Wujud GAS: Tidak ada gravitasi (memenuhi ruangan), bergerak sangat cepat dan acak
+                    engine.gravity.y = 0;
+                    p.frictionAir = 0.001; // Hampir tidak ada hambatan
+                    p.restitution = 1.0; // Sangat memantul sempurna
+
+                    // Gaya kinetik acak tinggi
+                    const gasForce = 0.005 + (temp / 100) * 0.005;
+                    Body.applyForce(p, p.position, {
+                        x: (Math.random() - 0.5) * gasForce,
+                        y: (Math.random() - 0.5) * gasForce
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

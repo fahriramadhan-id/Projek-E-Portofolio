@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E-Portofolio PPL II (Siklus 1 s.d. 4) — Fahri Eka Ramadhani, S.Pd</title>
+  <meta name="description" content="E-Portofolio Praktik Pengalaman Lapangan (PPL) II Semester 2 (Siklus 1 s.d. Siklus 4) — Fahri Eka Ramadhani, S.Pd | PPG Calon Guru Bidang Studi IPA Universitas Trunojoyo Madura di UPTD SMPN 1 Burneh." />
+
+  <!-- Google Fonts: Cinzel, Playfair Display, & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tema Peacock Reyog (#006D6F, #C8A951, #00383A, #F7FAFA) -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ========================================================================
+       STICKY TOP NAVBAR (PROPORSIONAL PADA ZOOM 100% LAPTOP)
+       ======================================================================== -->
+  <header class="top-navbar">
+    <div class="navbar-container">
+      <!-- Brand / Identitas Singkat -->
+      <a class="brand-logo" onclick="navigateTo('beranda')">
+        <div class="brand-crest" title="E-Portofolio PPL Semester II">🦚</div>
+        <div class="brand-text-wrap">
+          <span class="brand-title">E-PORTOFOLIO PPL SEMESTER II</span>
+          <span class="brand-subtitle">Fahri Eka Ramadhani, S.Pd • IPA UTM</span>
+        </div>
+      </a>
+
+      <!-- Menu Navigasi Utama -->
+      <ul class="nav-menu" id="main-nav-menu">
+        <li class="nav-item">
+          <button class="nav-link active" data-page="beranda" onclick="navigateTo('beranda')">
+            🏠 Beranda
+          </button>
+        </li>
+
+        <li class="nav-item">
+          <button class="nav-link" data-page="profil" onclick="navigateTo('profil')">
+            👤 Profil &amp; Pra-Siklus
+          </button>
+        </li>
+
+        <!-- SIKLUS 1 (E-Portofolio 1 / UTS) -->
+        <li class="nav-item">
+          <button class="nav-link" data-page="siklus-1" onclick="navigateTo('siklus-1', 'perangkat')">
+            📘 Siklus 1 <span class="badge-ep">EP1</span> ▾
+          </button>
+          <div class="dropdown-menu">
+            <button class="dropdown-item" onclick="navigateTo('siklus-1', 'perangkat')">
+              📂 Rencana &amp; Perangkat (Pert. 3–5)
+            </button>
+            <button class="dropdown-item" onclick="navigateTo('siklus-1', 'analisis')">
+              🔬 Analisis 6 Komponen Artefak
+            </button>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item" onclick="navigateTo('siklus-1', 'refleksi')">
+              📝 Refleksi LK 4.1 &amp; Penilaian GP
+            </button>
+          </div>
+        </li>
+
+        <!-- SIKLUS 2 (E-Portofolio 2 / UAS) -->
+        <li class="nav-item">
+          <button class="nav-link" data-page="siklus-2" onclick="navigateTo('siklus-2', 'perangkat')">
+            📗 Siklus 2 <span class="badge-ep">EP2</span> ▾
+          </button>
+          <div class="dropdown-menu">
+            <button class="dropdown-item" onclick="navigateTo('siklus-2', 'perangkat')">
+              📂 Rencana &amp; Perangkat (Pert. 6–8)
+            </button>
+            <button class="dropdown-item" onclick="navigateTo('siklus-2', 'analisis')">
+              🔬 Analisis 6 Komponen Artefak
+            </button>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item" onclick="navigateTo('siklus-2', 'refleksi')">
+              📝 Refleksi LK 4.2 &amp; Penilaian GP
+            </button>
+          </div>
+        </li>
+
+        <!-- SIKLUS 3 (E-Portofolio 2 / UAS) -->
+        <li class="nav-item">
+          <button class="nav-link" data-page="siklus-3" onclick="navigateTo('siklus-3', 'perangkat')">
+            📙 Siklus 3 <span class="badge-ep">EP2</span> ▾
+          </button>
+          <div class="dropdown-menu">
+            <button class="dropdown-item" onclick="navigateTo('siklus-3', 'perangkat')">
+              📂 Rencana &amp; Perangkat (Pert. 9–11)
+            </button>
+            <button class="dropdown-item" onclick="navigateTo('siklus-3', 'analisis')">
+              🔬 Analisis 6 Komponen Artefak
+            </button>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item" onclick="navigateTo('siklus-3', 'refleksi')">
+              📝 Refleksi LK 4.3 &amp; Penilaian GP
+            </button>
+          </div>
+        </li>
+
+        <!-- SIKLUS 4 (E-Portofolio 2 / UAS) -->
+        <li class="nav-item">
+          <button class="nav-link" data-page="siklus-4" onclick="navigateTo('siklus-4', 'perangkat')">
+            📕 Siklus 4 <span class="badge-ep">EP2</span> ▾
+          </button>
+          <div class="dropdown-menu">
+            <button class="dropdown-item" onclick="navigateTo('siklus-4', 'perangkat')">
+              📂 Rencana &amp; Perangkat (Pert. 12–13)
+            </button>
+            <button class="dropdown-item" onclick="navigateTo('siklus-4', 'analisis')">
+              🔬 Analisis 6 Komponen Artefak
+            </button>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item" onclick="navigateTo('siklus-4', 'refleksi')">
+              📝 Refleksi LK 4.4 &amp; Penilaian GP
+            </button>
+          </div>
+        </li>
+
+        <li class="nav-item">
+          <button class="nav-link" data-page="model-guru" onclick="navigateTo('model-guru')">
+            🌟 Model Guru &amp; RTL
+          </button>
+        </li>
+
+        <li class="nav-item">
+          <button class="nav-link" data-page="lampiran" onclick="navigateTo('lampiran')">
+            🗂️ Lampiran
+          </button>
+        </li>
+      </ul>
+
+      <!-- Tombol Aksi Cepat: Upload / Tambah Artefak -->
+      <div class="nav-actions">
+        <button class="btn-manage-artefak" onclick="openArtefakManager('siklus-4', 's4-pert13')" title="Tambahkan atau unggah artefak baru (termasuk slot Pertemuan 13 & Dokumentasi)">
+          ➕ Kelola Artefak
+        </button>
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Buka Menu">
+          ☰
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       BAR FILTER CAKUPAN TUGAS (GABUNGAN vs E-PORTOFOLIO 1 UTS vs E-PORTOFOLIO 2 UAS)
+       ======================================================================== -->
+  <div class="scope-bar">
+    <div class="scope-bar-inner">
+      <div class="scope-label">
+        <span>🦚 Tampilan Portofolio:</span>
+      </div>
+      <div class="scope-pills">
+        <button class="scope-pill active" data-scope="all" onclick="setScopeMode('all')">
+          ✨ Gabungan Semua (Pra-Siklus + Siklus 1 s.d. 4)
+        </button>
+        <button class="scope-pill" data-scope="ep1" onclick="setScopeMode('ep1')">
+          📘 Fokus E-Portofolio 1 (UTS — Siklus 1)
+        </button>
+        <button class="scope-pill" data-scope="ep2" onclick="setScopeMode('ep2')">
+          📗 Fokus E-Portofolio 2 (UAS — Siklus 2 s.d. 4)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       KONTAINER KONTEN UTAMA (DI-RENDER DINAMIS OLEH APP.JS)
+       ======================================================================== -->
+  <main id="app-main-content"></main>
+
+  <!-- ========================================================================
+       ROYAL FOOTER
+       ======================================================================== -->
+  <footer class="royal-footer">
+    <div class="footer-grid">
+      <div class="footer-col-left">
+        <h3>Fahri Eka Ramadhani, S.Pd</h3>
+        <p>
+          NIM. 250661101725 • Mahasiswa PPG Calon Guru Bidang Studi Ilmu Pengetahuan Alam (IPA)<br />
+          Fakultas Keguruan dan Ilmu Pendidikan — Universitas Trunodjoyo Madura<br />
+          Sekolah Mitra: UPTD SMP Negeri 1 Burneh, Kabupaten Bangkalan
+        </p>
+      </div>
+
+      <div class="footer-col-center">
+        <p>
+          “Catatan perjalanan belajar menjadi guru IPA yang terus berbenah bersama siswa kelas VII-B UPTD SMPN 1 Burneh.”
+        </p>
+      </div>
+
+      <div class="footer-col-right">
+        <a class="footer-email-pill" href="mailto:fahriramdh@gmail.com">
+          ✉️ fahriramdh@gmail.com
+        </a>
+        <div>
+          <a href="https://sites.google.com/view/e-portofolio-fahriramdh/beranda" target="_blank" rel="noopener" style="color:var(--reyog-gold-light);text-decoration:underline;font-size:0.8rem;">
+            🔗 Lihat E-Portofolio Semester 1 (Google Sites)
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================================
+       MODAL UNIVERSAL
+       ======================================================================== -->
+  <div class="modal-backdrop" id="universal-modal" onclick="if(event.target === this) closeUniversalModal()">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-title-text">Pratinjau Artefak Pembelajaran</h3>
+        <button class="modal-close-btn" onclick="closeUniversalModal()" title="Tutup">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body-content"></div>
+    </div>
+  </div>
+
+  <!-- Database Konten Lengkap & Aplikasi Interaktif -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

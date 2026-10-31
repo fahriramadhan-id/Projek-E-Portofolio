@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Titik Leleh & Titik Didih</title>
+    
+    <!-- Tailwind CSS untuk styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Pustaka Matter.js untuk fisika partikel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+
+    <style>
+        /* CSS kustom untuk slider agar terlihat menarik */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(to right, #3b82f6, #ef4444);
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 3px solid #1f2937;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen flex flex-col items-center py-8 text-slate-800 font-sans">
+
+    <div class="w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row">
+        
+        <!-- Panel Kontrol (Kiri) -->
+        <div class="w-full md:w-1/3 bg-slate-50 p-6 border-r border-slate-200 flex flex-col gap-6">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800 mb-2">Titik Leleh & Didih</h1>
+                <p class="text-sm text-slate-600">Amati pada suhu berapa partikel berubah wujud.</p>
+            </div>
+
+            <!-- Pemilihan Zat -->
+            <div>
+                <label for="substance" class="block text-sm font-semibold text-slate-700 mb-1">Pilih Zat:</label>
+                <select id="substance" class="w-full bg-white border border-slate-300 text-slate-700 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                    <option value="air">Air (H₂O)</option>
+                    <option value="besi">Besi (Fe)</option>
+                    <option value="oksigen">Oksigen (O₂)</option>
+                    <option value="etanol">Etanol (Alkohol)</option>
+                    <option value="parafin">Parafin (Lilin)</option>
+                </select>
+            </div>
+
+            <!-- Informasi Zat -->
+            <div class="bg-blue-50 rounded-lg p-4 border border-blue-100">
+                <div class="flex justify-between mb-2">
+                    <span class="text-sm text-slate-600 font-medium">Titik Leleh:</span>
+                    <span id="mp-display" class="text-sm font-bold text-blue-700">0 °C</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-sm text-slate-600 font-medium">Titik Didih:</span>
+                    <span id="bp-display" class="text-sm font-bold text-red-600">100 °C</span>
+                </div>
+            </div>
+
+            <!-- Status Wujud Saat Ini -->
+            <div class="mt-auto">
+                <p class="text-center text-sm font-semibold text-slate-500 mb-1">Wujud Saat Ini</p>
+                <div id="state-badge" class="w-full text-center py-3 rounded-lg font-bold text-xl transition-colors duration-300 bg-blue-100 text-blue-700 border border-blue-200">
+                    Padat
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Simulasi (Kanan) -->
+        <div class="w-full md:w-2/3 p-6 flex flex-col">
+            <!-- Kontrol Suhu -->
+            <div class="mb-6">
+                <div class="flex justify-between items-end mb-2">
+                    <label class="font-bold text-slate-700">Suhu Lingkungan</label>
+                    <span class="text-2xl font-black text-slate-800"><span id="temp-display">0</span> °C</span>
+                </div>
+                <div class="relative w-full">
+                    <input type="range" id="temp-slider" min="-50" max="150" value="-20">
+                    <!-- Penanda Visual -->
+                    <div class="flex justify-between text-xs text-slate-500 mt-1 font-medium">
+                        <span id="min-label">-50°C</span>
+                        <span id="max-label">150°C</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wadah Kanvas -->
+            <div id="canvas-container" class="w-full flex-grow bg-slate-900 rounded-xl overflow-hidden relative min-h-[400px]">
+                <!-- Indikator Suhu Ekstrem di background -->
+                <div id="bg-glow" class="absolute inset-0 opacity-20 pointer-events-none transition-colors duration-500 bg-blue-500"></div>
+                <!-- Kanvas Matter.js akan ditaruh di sini via JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Database karakteristik Zat
+        const substances = {
+            air: {
+                name: "Air",
+                mp: 0,
+                bp: 100,
+                min: -50,
+                max: 150,
+                startTemp: -20,
+                colorBase: { r: 52, g: 152, b: 219 } // Biru Air
+            },
+            besi: {
+                name: "Besi",
+                mp: 1538,
+                bp: 2862,
+                min: 1000,
+                max: 3500,
+                startTemp: 1200,
+                colorBase: { r: 149, g: 165, b: 166 } // Abu-abu
+            },
+            oksigen: {
+                name: "Oksigen",
+                mp: -218,
+                bp: -183,
+                min: -250,
+                max: -100,
+                startTemp: -230,
+                colorBase: { r: 155, g: 89, b: 182 } // Ungu pucat
+            },
+            etanol: {
+                name: "Etanol",
+                mp: -114,
+                bp: 78,
+                min: -150,
+                max: 150,
+                startTemp: 25,
+                colorBase: { r: 32, g: 201, b: 151 } // Hijau kebiruan (Teal)
+            },
+            parafin: {
+                name: "Parafin",
+                mp: 60,
+                bp: 370,
+                min: 0,
+                max: 450,
+                startTemp: 25,
+                colorBase: { r: 253, g: 230, b: 138 } // Kuning pucat lilin
+            }
+        };
+
+        // Elemen DOM
+        const subSelect = document.getElementById('substance');
+        const mpDisplay = document.getElementById('mp-display');
+        const bpDisplay = document.getElementById('bp-display');
+        const tempSlider = document.getElementById('temp-slider');
+        const tempDisplay = document.getElementById('temp-display');
+        const minLabel = document.getElementById('min-label');
+        const maxLabel = document.getElementById('max-label');
+        const stateBadge = document.getElementById('state-badge');
+        const bgGlow = document.getElementById('bg-glow');
+        const canvasContainer = document.getElementById('canvas-container');
+
+        let currentSubstance = substances['air'];
+        let currentTemp = currentSubstance.startTemp;
+
+        // Alias Matter.js
+        const Engine = Matter.Engine,
+              Render = Matter.Render,
+              Runner = Matter.Runner,
+              Bodies = Matter.Bodies,
+              Composite = Matter.Composite,
+              Events = Matter.Events,
+              Body = Matter.Body;
+
+        const engine = Engine.create();
+        const world = engine.world;
+        engine.gravity.y = 0; // Matikan gravitasi global untuk setup awal
+
+        // Ukuran kanvas
+        const width = canvasContainer.clientWidth;
+        const height = canvasContainer.clientHeight || 400;
+
+        const render = Render.create({
+            element: canvasContainer,
+            engine: engine,
+            options: {
+                width: width,
+                height: height,
+                background: 'transparent',
+                wireframes: false
+            }
+        });
+
+        // Dinding wadah
+        const wallOpt = { isStatic: true, render: { fillStyle: '#334155' } };
+        const ground = Bodies.rectangle(width/2, height+25, width, 50, wallOpt);
+        const ceiling = Bodies.rectangle(width/2, -25, width, 50, wallOpt);
+        const leftWall = Bodies.rectangle(-25, height/2, 50, height, wallOpt);
+        const rightWall = Bodies.rectangle(width+25, height/2, 50, height, wallOpt);
+        Composite.add(world, [ground, ceiling, leftWall, rightWall]);
+
+        // Partikel
+        const particles = [];
+        const cols = 10;
+        const rows = 8;
+        const radius = 12;
+        const spacing = 26;
+        const startX = (width - (cols * spacing)) / 2;
+        const startY = height - (rows * spacing) - 10;
+
+        for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < cols; j++) {
+                const x = startX + j * spacing;
+                const y = startY + i * spacing;
+                const p = Bodies.circle(x, y, radius, {
+                    restitution: 0.5,
+                    friction: 0.1,
+                    frictionAir: 0.05
+                });
+                p.homeX = x;
+                p.homeY = y;
+                particles.push(p);
+            }
+        }
+        Composite.add(world, particles);
+
+        Render.run(render);
+        const runner = Runner.create();
+        Runner.run(runner, engine);
+
+        
+        // Fungsi Update UI berdasarkan Zat
+        function updateSubstanceUI() {
+            mpDisplay.innerText = `${currentSubstance.mp} °C`;
+            bpDisplay.innerText = `${currentSubstance.bp} °C`;
+            
+            tempSlider.min = currentSubstance.min;
+            tempSlider.max = currentSubstance.max;
+            minLabel.innerText = `${currentSubstance.min} °C`;
+            maxLabel.innerText = `${currentSubstance.max} °C`;
+            
+            // Set slider to starting temp
+            tempSlider.value = currentSubstance.startTemp;
+            updateSimulation();
+        }
+
+        // Fungsi Update Simulasi
+        function updateSimulation() {
+            currentTemp = parseInt(tempSlider.value);
+            tempDisplay.innerText = currentTemp;
+
+            let state = 'Padat';
+            let energyRatio = 0; // Rasio untuk menentukan pergerakan
+            
+            // Logika Penentuan Wujud Zat
+            if (currentTemp >= currentSubstance.bp) {
+                state = 'Gas';
+                // Menghitung seberapa panas gas tersebut dari rentang BP sampai Max
+                energyRatio = (currentTemp - currentSubstance.bp) / (currentSubstance.max - currentSubstance.bp);
+            } else if (currentTemp >= currentSubstance.mp) {
+                state = 'Cair';
+                // Menghitung kepanasan cairan dari MP sampai BP
+                energyRatio = (currentTemp - currentSubstance.mp) / (currentSubstance.bp - currentSubstance.mp);
+            } else {
+                state = 'Padat';
+                // Menghitung kepanasan padatan
+                energyRatio = (currentTemp - currentSubstance.min) / (currentSubstance.mp - currentSubstance.min);
+            }
+
+            // Update Badge & Background
+            if (state === 'Padat') {
+                stateBadge.innerText = 'Wujud: Padat';
+                stateBadge.className = 'w-full text-center py-3 rounded-lg font-bold text-xl transition-colors duration-300 bg-blue-100 text-blue-700 border border-blue-200';
+                bgGlow.className = 'absolute inset-0 opacity-10 pointer-events-none transition-colors duration-500 bg-blue-500';
+            } else if (state === 'Cair') {
+                stateBadge.innerText = 'Wujud: Cair';
+                stateBadge.className = 'w-full text-center py-3 rounded-lg font-bold text-xl transition-colors duration-300 bg-purple-100 text-purple-700 border border-purple-200';
+                bgGlow.className = 'absolute inset-0 opacity-10 pointer-events-none transition-colors duration-500 bg-purple-500';
+            } else {
+                stateBadge.innerText = 'Wujud: Gas';
+                stateBadge.className = 'w-full text-center py-3 rounded-lg font-bold text-xl transition-colors duration-300 bg-red-100 text-red-700 border border-red-200';
+                bgGlow.className = 'absolute inset-0 opacity-20 pointer-events-none transition-colors duration-500 bg-red-500';
+            }
+
+            // Base color
+            const c = currentSubstance.colorBase;
+            const rgbStr = `rgb(${c.r}, ${c.g}, ${c.b})`;
+
+            // Terapkan ke fisika (dipanggil di beforeUpdate untuk terus menerus)
+            window.simState = { state, energyRatio, rgbStr };
+        }
+
+        // Event Listeners
+        subSelect.addEventListener('change', (e) => {
+            currentSubstance = substances[e.target.value];
+            updateSubstanceUI();
+        });
+
+        tempSlider.addEventListener('input', updateSimulation);
+
+        // Fisika yang berjalan setiap frame
+        Events.on(engine, 'beforeUpdate', function() {
+            if (!window.simState) return;
+            const { state, energyRatio, rgbStr } = window.simState;
+
+            particles.forEach(p => {
+                p.render.fillStyle = rgbStr;
+
+                // Batas Kecepatan (Clamp Velocity) - Mencegah Error NaN
+                const maxSpeed = 20;
+                const speed = Math.sqrt(p.velocity.x * p.velocity.x + p.velocity.y * p.velocity.y);
+                if (speed > maxSpeed) {
+                    const ratio = maxSpeed / speed;
+                    Body.setVelocity(p, {
+                        x: p.velocity.x * ratio,
+                        y: p.velocity.y * ratio
+                    });
+                }
+
+                if (state === 'Padat') {
+                    engine.gravity.y = 0; 
+                    p.frictionAir = 0.2;
+                    
+                    // Tarik ke posisi asal
+                    const dx = p.homeX - p.position.x;
+                    const dy = p.homeY - p.position.y;
+                    
+                    // Batasi gaya tarik
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    const safeDx = dist > 0 ? (dx/dist) * Math.min(dist, 50) : 0;
+                    const safeDy = dist > 0 ? (dy/dist) * Math.min(dist, 50) : 0;
+                    
+                    Body.applyForce(p, p.position, {
+                        x: safeDx * 0.003,
+                        y: safeDy * 0.003
+                    });
+
+                    // Getaran berdasarkan suhu
+                    const vibration = 0.001 + (energyRatio * 0.002);
+                    Body.applyForce(p, p.position, {
+                        x: (Math.random() - 0.5) * vibration,
+                        y: (Math.random() - 0.5) * vibration
+                    });
+
+                } else if (state === 'Cair') {
+                    engine.gravity.y = 1; // Mengendap di bawah
+                    p.frictionAir = 0.05;
+                    p.restitution = 0.4;
+                    
+                    // Gaya mengalir
+                    const flow = 0.002 + (energyRatio * 0.003);
+                    Body.applyForce(p, p.position, {
+                        x: (Math.random() - 0.5) * flow,
+                        y: (Math.random() - 0.5) * flow
+                    });
+
+                } else {
+                    engine.gravity.y = 0; // Bebas bergerak di seluruh wadah
+                    p.frictionAir = 0.001;
+                    p.restitution = 0.9; // Sangat memantul
+                    
+                    // Gaya kinetik tinggi
+                    const gasForce = 0.008 + (energyRatio * 0.007);
+                    Body.applyForce(p, p.position, {
+                        x: (Math.random() - 0.5) * gasForce,
+                        y: (Math.random() - 0.5) * gasForce
+                    });
+                }
+            });
+        });
+
+        // Inisialisasi awal
+        updateSubstanceUI();
+
+    </script>
+</body>
+</html>

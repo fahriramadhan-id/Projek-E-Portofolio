@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking Reveal - Kelas VII B</title>
+    <style>
+        :root {
+            --dark-blue: #0f172a;
+            --mid-blue: #1e3a8a;
+            --light-blue: #38bdf8;
+            --white: #f8fafc;
+            --gold: #fbbf24;
+            --gold-dark: #b45309;
+            --orange: #f97316;
+            --bronze: #cd7f32;
+            --silver: #e2e8f0;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: radial-gradient(circle at center, var(--mid-blue) 0%, var(--dark-blue) 100%);
+            color: var(--white);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #fx-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        #app-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            z-index: 20;
+            perspective: 1000px;
+        }
+
+        #controls-bar {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 30;
+            position: relative;
+        }
+
+        .controls-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        #progress-container {
+            flex: 1;
+            margin: 0 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        #progress-text {
+            font-size: 0.875rem;
+            color: var(--light-blue);
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        #progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        #progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--light-blue), var(--gold));
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        button {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--white);
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.primary {
+            background: linear-gradient(135deg, var(--light-blue), #2563eb);
+            border: none;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        }
+
+        button.primary:hover {
+            background: linear-gradient(135deg, #7dd3fc, var(--light-blue));
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.6);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        @keyframes zoomOutFade {
+            0% { opacity: 0; transform: scale(1.5); }
+            20% { opacity: 1; transform: scale(1); }
+            80% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.8); }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes pulseGlow {
+            0% { text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
+            50% { text-shadow: 0 0 30px rgba(251, 191, 36, 1), 0 0 60px rgba(251, 191, 36, 0.6); }
+            100% { text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
+        }
+
+        .animate-fade-up { animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        .animate-fade-in { animation: fadeIn 1s ease forwards; opacity: 0; }
+        .animate-zoom-in { animation: zoomIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; opacity: 0; }
+        
+        .delay-1 { animation-delay: 0.5s; }
+        .delay-2 { animation-delay: 1.2s; }
+        .delay-3 { animation-delay: 2s; }
+
+        .scene {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .scene.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .title-huge {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 800;
+            background: linear-gradient(to bottom right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+            letter-spacing: -2px;
+        }
+
+        .subtitle {
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            color: var(--light-blue);
+            font-weight: 600;
+            letter-spacing: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        .chapter {
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            color: #cbd5e1;
+            font-style: italic;
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 3rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-width: 800px;
+            width: 90%;
+            transform-style: preserve-3d;
+        }
+
+        .text-suspense {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            font-weight: 300;
+            color: var(--white);
+            line-height: 1.4;
+        }
+
+        /* Rank Reveal Elements */
+        .rank-label {
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            color: var(--light-blue);
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .student-name {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            color: var(--white);
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+        }
+
+        .score-box {
+            display: inline-block;
+            background: rgba(0,0,0,0.3);
+            border: 2px solid var(--light-blue);
+            padding: 0.5rem 2rem;
+            border-radius: 50px;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 900;
+            color: var(--light-blue);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+        }
+
+        /* Grid for Rank 5 Tie */
+        .tie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            width: 90%;
+            max-width: 1200px;
+            margin-top: 2rem;
+        }
+
+        .tie-card {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .tie-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .tie-score {
+            font-size: 2rem;
+            color: var(--light-blue);
+            font-weight: 900;
+        }
+
+        /* Special Rank Colors */
+        .rank-3 .rank-label, .rank-3 .score-box { color: var(--bronze); border-color: var(--bronze); box-shadow: 0 0 20px rgba(205, 127, 50, 0.3); }
+        .rank-2 .rank-label, .rank-2 .score-box { color: var(--silver); border-color: var(--silver); box-shadow: 0 0 20px rgba(226, 232, 240, 0.3); }
+        
+        .rank-1 .rank-label {
+            color: var(--gold);
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            text-shadow: 0 0 15px rgba(251, 191, 36, 0.5);
+        }
+        .rank-1 .student-name {
+            background: linear-gradient(to right, #fbbf24, #f59e0b, #fbbf24);
+            -webkit-background-clip: text;
+            color: transparent;
+            animation: pulseGlow 3s infinite;
+            font-size: clamp(3rem, 8vw, 6rem);
+        }
+        .rank-1 .score-box {
+            color: var(--gold);
+            border-color: var(--gold);
+            background: rgba(180, 83, 9, 0.2);
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.5);
+            font-size: clamp(3rem, 5vw, 4rem);
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .summary-table th, .summary-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .summary-table th {
+            color: var(--light-blue);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .summary-table tr.top-1 { background: rgba(251, 191, 36, 0.15); font-weight: bold; color: var(--gold); }
+        .summary-table tr.top-2 { background: rgba(226, 232, 240, 0.1); font-weight: bold; }
+        .summary-table tr.top-3 { background: rgba(205, 127, 50, 0.1); font-weight: bold; }
+        
+        .summary-container {
+            max-height: 70vh;
+            overflow-y: auto;
+            width: 90%;
+            max-width: 900px;
+        }
+
+        /* Custom Scrollbar for table */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.5); }
+
+        .hidden { display: none !important; }
+        
+        /* Spotlight Effect for Rank 1 */
+        .spotlight {
+            position: absolute;
+            top: -50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150vw;
+            height: 150vh;
+            background: radial-gradient(ellipse at center, rgba(251, 191, 36, 0.15) 0%, transparent 60%);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 2s ease;
+            mix-blend-mode: screen;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="fx-canvas"></canvas>
+    <div id="spotlight" class="spotlight"></div>
+
+    <div id="app-container">
+        <!-- Scenes will be injected here dynamically -->
+    </div>
+
+    <div id="controls-bar">
+        <div class="controls-group">
+            <button id="btn-sound" onclick="toggleSound()">🔊 Sound ON</button>
+            <button id="btn-fullscreen" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+        </div>
+
+        <div id="progress-container">
+            <div id="progress-text">OPENING</div>
+            <div id="progress-bar">
+                <div id="progress-fill"></div>
+            </div>
+        </div>
+
+        <div class="controls-group">
+            <button id="btn-reset" onclick="resetApp()">↺ Ulangi</button>
+            <button id="btn-skip" onclick="skipAnimation()" style="display: none;">⏭ Skip Animasi</button>
+            <button id="btn-next" class="primary" onclick="handleNext()">LANJUT ➔</button>
+        </div>
+    </div>
+
+    <script>
+        // Data Ranking (Competition Ranking Format)
+        const students = [
+            { rank: 10, name: "Rehan Afandi", score: "65,56" },
+            { rank: 9, name: "Jagad Akbar", score: "70,00" },
+            { rank: 5, isTie: true, names: ["M. Hanafi", "Nabila Ayu Herawati", "Novi Firdia Damayanti", "Ulfa Hoirunnisa"], score: "72,22" },
+            { rank: 4, name: "Fatimatus Sakdiyeh", score: "74,44" },
+            { rank: 3, name: "Claudia Fatmawati Natalia Putri", score: "78,33" },
+            { rank: 2, name: "Maulidatul Kamila", score: "82,22" },
+            { rank: 1, name: "Azmina Liya Zafira", score: "92,22" }
+        ];
+
+        // State Management
+        let currentSceneIndex = 0;
+        let currentSubstep = 0;
+        let isAnimating = false;
+        let activeTimeouts = [];
+        let soundEnabled = true;
+        let audioCtx = null;
+
+        const container = document.getElementById('app-container');
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+        const btnNext = document.getElementById('btn-next');
+        const btnSkip = document.getElementById('btn-skip');
+        const spotlight = document.getElementById('spotlight');
+
+        const scriptFlow = [
+            { id: 'opening', type: 'static', title: 'OPENING' },
+            { id: 'disclaimer', type: 'static', title: 'PERSIAPAN' },
+            { id: 'countdown', type: 'static', title: 'COUNTDOWN' },
+            { id: 'rank_10', type: 'reveal', data: students[0], title: 'TOP 10' },
+            { id: 'rank_9', type: 'reveal', data: students[1], title: 'TOP 9' },
+            { id: 'transition_tie', type: 'static', title: 'TUNGGU...' }, // Explaining jump 9 -> 5
+            { id: 'rank_5_tie', type: 'reveal_tie', data: students[2], title: 'TOP 5' },
+            { id: 'rank_4', type: 'reveal', data: students[3], title: 'TOP 4' },
+            { id: 'top3_intro', type: 'static', title: 'FINAL 3' },
+            { id: 'rank_3', type: 'reveal', data: students[4], title: 'TOP 3', styleClass: 'rank-3' },
+            { id: 'rank_2', type: 'reveal', data: students[5], title: 'TOP 2', styleClass: 'rank-2' },
+            { id: 'rank_1_intro', type: 'static', title: 'FINAL' },
+            { id: 'rank_1', type: 'reveal', data: students[6], title: 'TOP 1', styleClass: 'rank-1' },
+            { id: 'summary', type: 'static', title: 'SUMMARY' }
+        ];
+
+        function initAudio() {
+            if (!audioCtx && soundEnabled) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playTone(freq, type = 'sine', duration = 0.5, vol = 0.1) {
+            if (!soundEnabled || !audioCtx) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function playNoise(duration, vol = 0.1) {
+            if (!soundEnabled || !audioCtx) return;
+            const bufferSize = audioCtx.sampleRate * duration;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+            const gain = audioCtx.createGain();
+            
+            // Lowpass filter for 'boom' or 'suspense'
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = 400;
+
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+            noise.start();
+        }
+
+        const SFX = {
+            click: () => playTone(600, 'sine', 0.1, 0.05),
+            beep: () => playTone(440, 'square', 0.2, 0.05),
+            highBeep: () => playTone(880, 'square', 0.4, 0.08),
+            suspense: () => { playTone(100, 'sawtooth', 3, 0.05); playNoise(3, 0.02); },
+            revealRank: () => playTone(300, 'triangle', 0.5, 0.1),
+            revealName: () => playTone(500, 'triangle', 0.6, 0.1),
+            revealScore: () => {
+                playTone(523.25, 'sine', 1.5, 0.1); // C5
+                playTone(659.25, 'sine', 1.5, 0.1); // E5
+                playTone(783.99, 'sine', 1.5, 0.1); // G5
+            },
+            victory: () => {
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((f, i) => setTimeout(() => playTone(f, 'square', 1, 0.15), i * 150));
+                setTimeout(() => playNoise(2, 0.2), 300); // Explosion/Confetti sound
+            }
+        };
+
+        const canvas = document.getElementById('fx-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let animFrame;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor(x, y, isGold = false) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 8 + 4;
+                this.speedX = Math.random() * 6 - 3;
+                this.speedY = Math.random() * -10 - 5;
+                this.gravity = 0.3;
+                this.rotation = Math.random() * 360;
+                this.rotationSpeed = Math.random() * 10 - 5;
+                
+                const colors = isGold ? ['#fbbf24', '#f59e0b', '#ffffff'] : ['#38bdf8', '#fbbf24', '#f8fafc', '#f97316'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.speedY += this.gravity;
+                this.rotation += this.rotationSpeed;
+            }
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation * Math.PI / 180);
+                ctx.fillStyle = this.color;
+                ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+                ctx.restore();
+            }
+        }
+
+        function triggerConfetti(x, y, amount = 100, isGold = false) {
+            for (let i = 0; i < amount; i++) {
+                particles.push(new Particle(x, y, isGold));
+            }
+            if (!animFrame) loopConfetti();
+        }
+
+        function loopConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].y > canvas.height) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            if (particles.length > 0) {
+                animFrame = requestAnimationFrame(loopConfetti);
+            } else {
+                animFrame = null;
+            }
+        }
+
+        function safeTimeout(fn, delay) {
+            const id = setTimeout(fn, delay);
+            activeTimeouts.push(id);
+            return id;
+        }
+
+        function clearTimeouts() {
+            activeTimeouts.forEach(clearTimeout);
+            activeTimeouts = [];
+        }
+
+        function updateUI() {
+            const scene = scriptFlow[currentSceneIndex];
+            progressText.innerText = scene.title;
+            const progress = ((currentSceneIndex) / (scriptFlow.length - 1)) * 100;
+            progressFill.style.width = `${progress}%`;
+
+            if (currentSceneIndex === 0) {
+                btnNext.innerHTML = "▶ MULAI PENGUMUMAN";
+            } else {
+                btnNext.innerHTML = isAnimating ? "⏭ LEWATI ANIMASI" : "LANJUT ➔";
+            }
+        }
+
+        function renderScene() {
+            clearTimeouts();
+            container.innerHTML = '';
+            const scene = scriptFlow[currentSceneIndex];
+            updateUI();
+            
+            // Default background adjustments
+            document.body.style.background = 'radial-gradient(circle at center, var(--mid-blue) 0%, var(--dark-blue) 100%)';
+            spotlight.style.opacity = '0';
+
+            switch (scene.id) {
+                case 'opening':
+                    renderHTML(`
+                        <div class="scene active">
+                            <h1 class="title-huge animate-fade-up">RANKING REVEAL</h1>
+                            <div class="subtitle animate-fade-up delay-1">KELAS VII B</div>
+                            <div class="chapter animate-fade-up delay-2">Bab "Suhu, Kalor, dan Pemuaiannya"</div>
+                        </div>
+                    `);
+                    isAnimating = false;
+                    break;
+                    
+                case 'disclaimer':
+                    renderHTML(`
+                        <div class="scene active glass-card">
+                            <h2 class="animate-fade-in" style="font-size: 2rem; margin-bottom: 2rem;">Sebelum dimulai...</h2>
+                            <p class="animate-fade-in delay-1" style="font-size: 1.5rem; line-height: 1.6; color: var(--light-blue);">
+                                Ranking ini bukan tentang siapa yang paling sempurna.<br><br>
+                                Ini adalah gambaran dari proses, usaha, dan hasil belajar kalian pada bab ini.
+                            </p>
+                        </div>
+                    `);
+                    SFX.suspense();
+                    isAnimating = true;
+                    safeTimeout(() => { isAnimating = false; updateUI(); }, 2000);
+                    break;
+
+                case 'countdown':
+                    renderHTML(`<div class="scene active" id="cd-container"></div>`);
+                    runCountdown();
+                    break;
+
+                case 'transition_tie':
+                    renderHTML(`
+                        <div class="scene active glass-card">
+                            <h2 class="animate-fade-in text-suspense">Tunggu sebentar...</h2>
+                            <p class="animate-fade-in delay-1 text-suspense" style="margin-top: 2rem; font-size: 1.5rem;">
+                                Setelah Peringkat 9, kemana peringkat 8, 7, dan 6?<br>
+                                Mari kita lihat apa yang terjadi di Peringkat 5!
+                            </p>
+                        </div>
+                    `);
+                    SFX.suspense();
+                    isAnimating = true;
+                    safeTimeout(() => { isAnimating = false; updateUI(); }, 2000);
+                    break;
+
+                case 'top3_intro':
+                    renderHTML(`
+                        <div class="scene active">
+                            <h1 class="title-huge animate-zoom-in" style="color: var(--orange); text-shadow: 0 0 30px red;">🔥 FINAL 3 🔥</h1>
+                        </div>
+                    `);
+                    SFX.suspense();
+                    isAnimating = true;
+                    safeTimeout(() => { isAnimating = false; updateUI(); }, 1500);
+                    break;
+
+                case 'rank_1_intro':
+                    renderHTML(`
+                        <div class="scene active">
+                            <h2 class="text-suspense animate-fade-in" id="r1-text1">Dan sekarang...</h2>
+                            <h2 class="text-suspense animate-fade-in delay-1" id="r1-text2" style="margin-top: 1rem;">hanya tersisa satu nama.</h2>
+                            <h1 class="title-huge animate-zoom-in delay-3" style="margin-top: 3rem; font-size: clamp(2rem, 5vw, 4rem);">SIAPA YANG MENJADI PERINGKAT 1?</h1>
+                        </div>
+                    `);
+                    SFX.suspense();
+                    isAnimating = true;
+                    safeTimeout(() => { isAnimating = false; updateUI(); }, 3500);
+                    break;
+
+                case 'summary':
+                    renderSummary();
+                    break;
+
+                default:
+                    if (scene.type === 'reveal') {
+                        renderGenericReveal(scene);
+                    } else if (scene.type === 'reveal_tie') {
+                        renderTieReveal(scene);
+                    }
+                    break;
+            }
+        }
+
+        function renderHTML(html) {
+            container.innerHTML = html;
+        }
+
+        function runCountdown() {
+            isAnimating = true;
+            updateUI();
+            const box = document.getElementById('cd-container');
+            let count = 3;
+            
+            function tick() {
+                if (count > 0) {
+                    box.innerHTML = `<div style="font-size: 15rem; font-weight: 900; animation: zoomOutFade 1s forwards;">${count}</div>`;
+                    SFX.beep();
+                    count--;
+                    safeTimeout(tick, 1000);
+                } else {
+                    box.innerHTML = `<h1 class="title-huge animate-zoom-in" style="color: var(--gold);">LET'S REVEAL THE TOP 10!</h1>`;
+                    SFX.highBeep();
+                    isAnimating = false;
+                    updateUI();
+                }
+            }
+            tick();
+        }
+
+        function renderGenericReveal(scene) {
+            currentSubstep = 0;
+            isAnimating = true;
+            updateUI();
+            
+            const html = `
+                <div class="scene active ${scene.styleClass || ''}">
+                    <div class="rank-label hidden" id="rev-rank">Peringkat ${scene.data.rank}</div>
+                    <div class="student-name hidden" id="rev-name">${scene.data.name}</div>
+                    <div class="score-box hidden" id="rev-score">${scene.data.score}</div>
+                </div>
+            `;
+            renderHTML(html);
+            
+            // Sequence
+            safeTimeout(() => {
+                const elRank = document.getElementById('rev-rank');
+                elRank.classList.remove('hidden');
+                elRank.classList.add('animate-fade-up');
+                SFX.revealRank();
+            }, 300);
+
+            safeTimeout(() => {
+                const elName = document.getElementById('rev-name');
+                elName.classList.remove('hidden');
+                elName.classList.add('animate-zoom-in');
+                SFX.revealName();
+            }, 1500);
+
+            safeTimeout(() => {
+                const elScore = document.getElementById('rev-score');
+                elScore.classList.remove('hidden');
+                elScore.classList.add('animate-fade-up');
+                SFX.revealScore();
+                
+                if (scene.id === 'rank_1') {
+                    SFX.victory();
+                    document.body.style.background = '#020617'; // Darken
+                    spotlight.style.opacity = '1';
+                    triggerConfetti(window.innerWidth / 2, window.innerHeight, 200, true);
+                    triggerConfetti(window.innerWidth / 4, window.innerHeight, 100, true);
+                    triggerConfetti((window.innerWidth / 4) * 3, window.innerHeight, 100, true);
+                } else {
+                    triggerConfetti(window.innerWidth / 2, window.innerHeight, 40);
+                }
+
+                isAnimating = false;
+                updateUI();
+            }, 3000);
+        }
+
+        function renderTieReveal(scene) {
+            isAnimating = true;
+            updateUI();
+            
+            let cardsHtml = scene.data.names.map((name, i) => `
+                <div class="tie-card hidden" id="tie-card-${i}">
+                    <div class="tie-name">${name}</div>
+                    <div class="tie-score">${scene.data.score}</div>
+                </div>
+            `).join('');
+
+            const html = `
+                <div class="scene active">
+                    <div class="rank-label hidden" id="tie-rank">PERINGKAT 5</div>
+                    <div class="text-suspense hidden" id="tie-text1" style="margin-top: 1rem;">Tapi... sepertinya ada sesuatu yang berbeda.</div>
+                    <div class="text-suspense hidden" id="tie-text2" style="color: var(--gold); font-weight: bold; margin-top: 1rem;">Empat siswa memperoleh nilai yang sama!</div>
+                    <div class="tie-grid">
+                        ${cardsHtml}
+                    </div>
+                    <div class="hidden" id="tie-note" style="margin-top: 2rem; font-size: 1rem; color: #94a3b8; font-style: italic;">
+                        *Karena menggunakan competition ranking, keempatnya berada di peringkat 5.
+                    </div>
+                </div>
+            `;
+            renderHTML(html);
+
+            safeTimeout(() => { document.getElementById('tie-rank').classList.replace('hidden', 'animate-fade-up'); SFX.revealRank(); }, 300);
+            safeTimeout(() => { document.getElementById('tie-text1').classList.replace('hidden', 'animate-fade-in'); SFX.suspense(); }, 1500);
+            safeTimeout(() => { document.getElementById('tie-text2').classList.replace('hidden', 'animate-zoom-in'); SFX.highBeep(); }, 3500);
+            
+            // Pop cards one by one rapidly
+            scene.data.names.forEach((_, i) => {
+                safeTimeout(() => {
+                    document.getElementById(`tie-card-${i}`).classList.replace('hidden', 'animate-fade-up');
+                    SFX.revealName();
+                }, 5000 + (i * 300));
+            });
+
+            safeTimeout(() => {
+                document.getElementById('tie-note').classList.replace('hidden', 'animate-fade-in');
+                SFX.revealScore();
+                triggerConfetti(window.innerWidth / 2, window.innerHeight, 100);
+                isAnimating = false;
+                updateUI();
+            }, 5000 + (scene.data.names.length * 300) + 500);
+        }
+
+        function renderSummary() {
+            let rows = students.map(s => {
+                let rowClass = '';
+                if (s.rank === 1) rowClass = 'top-1';
+                else if (s.rank === 2) rowClass = 'top-2';
+                else if (s.rank === 3) rowClass = 'top-3';
+
+                if (s.isTie) {
+                    return s.names.map((n, idx) => `
+                        <tr class="${rowClass}">
+                            <td>${idx === 0 ? s.rank : ''}</td>
+                            <td>${n}</td>
+                            <td>${s.score}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    return `
+                        <tr class="${rowClass}">
+                            <td>${s.rank}</td>
+                            <td>${s.name}</td>
+                            <td>${s.score}</td>
+                        </tr>
+                    `;
+                }
+            }).join('');
+
+            const html = `
+                <div class="scene active glass-card" style="padding: 2rem;">
+                    <h2 style="color: var(--gold); margin-bottom: 1rem; font-size: 2rem;">🏆 TOP 10 KELAS VII B 🏆</h2>
+                    <div class="summary-container">
+                        <table class="summary-table">
+                            <thead><tr><th>Peringkat</th><th>Nama Siswa</th><th>Nilai</th></tr></thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                    <p style="margin-top: 1.5rem; font-size: 1.2rem;">Selamat untuk 10 besar! 🎉</p>
+                    <p style="margin-top: 0.5rem; font-size: 1rem; color: #94a3b8;">Bagi yang belum masuk 10 besar, jangan berhenti di sini. Bab berikutnya masih bisa berubah.</p>
+                </div>
+            `;
+            renderHTML(html);
+            triggerConfetti(window.innerWidth / 2, -20, 150); // Fall from top
+        }
+
+        function handleNext() {
+            initAudio(); // Initialize audio on first user interaction
+            SFX.click();
+            
+            if (isAnimating) {
+                skipAnimation();
+                return;
+            }
+
+            if (currentSceneIndex < scriptFlow.length - 1) {
+                currentSceneIndex++;
+                renderScene();
+            }
+        }
+
+        function skipAnimation() {
+            if (!isAnimating) return;
+            clearTimeouts();
+            isAnimating = false;
+            
+            // Force remove hidden classes and animations to show final state immediately
+            const hiddenEls = container.querySelectorAll('.hidden');
+            hiddenEls.forEach(el => {
+                el.classList.remove('hidden');
+                el.style.opacity = '1';
+                el.style.transform = 'none';
+                el.style.animation = 'none';
+            });
+            
+            updateUI();
+        }
+
+        function resetApp() {
+            SFX.click();
+            currentSceneIndex = 0;
+            renderScene();
+        }
+
+        function toggleSound() {
+            initAudio();
+            soundEnabled = !soundEnabled;
+            const btn = document.getElementById('btn-sound');
+            btn.innerHTML = soundEnabled ? '🔊 Sound ON' : '🔇 Sound OFF';
+            if (!soundEnabled) SFX.click(); // Won't play, but logic is there
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'Enter' || e.key === ' ') {
+                handleNext();
+            }
+        });
+
+        // Initialize first scene
+        window.onload = () => {
+            renderScene();
+        };
+
+    </script>
+</body>
+</html>

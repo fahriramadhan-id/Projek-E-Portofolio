@@ -1,0 +1,2042 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DETEKTIF GAYA: Laboratorium Virtual IPA VII</title>
+    <style>
+        :root {
+            --bg-page: #f4f7fb;
+            --bg-card: #ffffff;
+            --bg-subtle: #eff6ff;
+            --bg-muted: #f8fafc;
+            --text-main: #0f172a;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+            --primary: #1d4ed8;
+            --primary-hover: #1e40af;
+            --primary-light: #dbeafe;
+            --force-orange: #ea580c;
+            --force-orange-bg: #ffedd5;
+            --velocity-teal: #0d9488;
+            --velocity-teal-bg: #ccfbf1;
+            --border-color: #cbd5e1;
+            --border-light: #e2e8f0;
+            --success: #15803d;
+            --success-bg: #dcfce7;
+            --warning: #b45309;
+            --warning-bg: #fef3c7;
+            --danger: #b91c1c;
+            --danger-bg: #fee2e2;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+            --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-bottom: 48px;
+        }
+
+        .container {
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        header.app-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
+            color: #ffffff;
+            padding: 24px 0;
+            border-bottom: 4px solid #fb923c;
+            margin-bottom: 20px;
+        }
+
+        .header-inner {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .badge-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(255, 255, 255, 0.16);
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            width: fit-content;
+            letter-spacing: 0.03em;
+        }
+
+        .app-title {
+            font-size: 1.85rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+
+        .app-subtitle {
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: #dbeafe;
+        }
+
+        .objective-box {
+            margin-top: 8px;
+            background-color: rgba(255, 255, 255, 0.12);
+            border-left: 4px solid #fb923c;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.96rem;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .step-item {
+            background-color: var(--bg-muted);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .step-number {
+            background-color: var(--primary);
+            color: #ffffff;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .glossary-bar {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px dashed var(--border-color);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .glossary-pill {
+            background-color: var(--bg-subtle);
+            border: 1px solid #bfdbfe;
+            color: #1e3a8a;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .mode-card {
+            background-color: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+        }
+
+        .mode-card.active {
+            border-color: var(--primary);
+            background-color: #f8fbff;
+            box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
+        }
+
+        .mode-tag {
+            display: inline-block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--primary);
+            background-color: var(--primary-light);
+            padding: 3px 10px;
+            border-radius: 999px;
+            margin-bottom: 6px;
+        }
+
+        .mode-card h2 {
+            font-size: 1.25rem;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .mode-card p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 18px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: background-color 0.15s, transform 0.1s, opacity 0.15s;
+            font-family: inherit;
+            min-height: 44px;
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-outline {
+            background-color: #ffffff;
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background-color: var(--bg-subtle);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: #ffffff;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background-color: #166534;
+        }
+
+        .btn-warning {
+            background-color: #d97706;
+            color: #ffffff;
+        }
+
+        .btn-warning:hover:not(:disabled) {
+            background-color: #b45309;
+        }
+
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background-color: #cbd5e1;
+        }
+
+        .btn-danger-outline {
+            background-color: #ffffff;
+            color: var(--danger);
+            border-color: #fca5a5;
+        }
+
+        .btn-danger-outline:hover:not(:disabled) {
+            background-color: var(--danger-bg);
+        }
+
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .fixed-vars-list {
+            list-style: none;
+            background-color: var(--bg-muted);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            margin-bottom: 16px;
+        }
+
+        .fixed-vars-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 0.9rem;
+            border-bottom: 1px dashed var(--border-light);
+        }
+
+        .fixed-vars-list li:last-child {
+            border-bottom: none;
+        }
+
+        .fixed-vars-list .var-label {
+            color: var(--text-secondary);
+        }
+
+        .fixed-vars-list .var-val {
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .option-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            text-align: left;
+            padding: 12px 14px;
+            background-color: #ffffff;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: #93c5fd;
+            background-color: #f8fafc;
+        }
+
+        .option-btn.selected {
+            border-color: var(--force-orange);
+            background-color: #fff7ed;
+            box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.15);
+        }
+
+        .option-btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .option-icon {
+            width: 44px;
+            height: 36px;
+            background-color: var(--force-orange-bg);
+            border: 1px solid #fdba74;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .option-title {
+            font-weight: 700;
+            font-size: 0.96rem;
+            color: var(--text-main);
+            display: block;
+        }
+
+        .option-desc {
+            font-size: 0.83rem;
+            color: var(--text-secondary);
+            display: block;
+        }
+
+        .control-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .control-actions .btn-full {
+            grid-column: span 2;
+        }
+
+        .status-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.92rem;
+            font-weight: 600;
+            margin-bottom: 14px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-muted);
+        }
+
+        .status-banner.status-ready {
+            background-color: var(--bg-subtle);
+            border-color: #bfdbfe;
+            color: #1e3a8a;
+        }
+
+        .status-banner.status-running {
+            background-color: var(--warning-bg);
+            border-color: #fde68a;
+            color: var(--warning);
+        }
+
+        .status-banner.status-paused {
+            background-color: #f1f5f9;
+            border-color: #94a3b8;
+            color: #334155;
+        }
+
+        .status-banner.status-finished {
+            background-color: var(--success-bg);
+            border-color: #86efac;
+            color: var(--success);
+        }
+
+        .canvas-wrapper {
+            width: 100%;
+            background-color: #ffffff;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            position: relative;
+        }
+
+        canvas#simCanvas {
+            display: block;
+            width: 100%;
+            background-color: #ffffff;
+            touch-action: pan-y;
+        }
+
+        .legend-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding: 10px 14px;
+            background-color: var(--bg-muted);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-line {
+            width: 24px;
+            height: 4px;
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .model-note {
+            font-size: 0.84rem;
+            color: var(--text-muted);
+            background-color: #f8fafc;
+            border-left: 3px solid #94a3b8;
+            padding: 8px 12px;
+            margin-top: 10px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .result-summary-box {
+            margin-top: 16px;
+            background-color: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .result-metric {
+            background-color: #ffffff;
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            padding: 10px 12px;
+        }
+
+        .result-metric .metric-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: block;
+        }
+
+        .result-metric .metric-value {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .result-explanation {
+            margin-top: 12px;
+            padding: 10px 14px;
+            background-color: var(--bg-subtle);
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            font-size: 0.92rem;
+            color: #1e3a8a;
+            font-weight: 500;
+        }
+
+        .table-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .table-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+        }
+
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 620px;
+            font-size: 0.92rem;
+        }
+
+        table.data-table th,
+        table.data-table td {
+            padding: 11px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        table.data-table th {
+            background-color: #f1f5f9;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        table.data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .empty-table-msg {
+            text-align: center !important;
+            color: var(--text-muted);
+            padding: 22px !important;
+            font-style: italic;
+        }
+
+        .confirm-box {
+            margin-top: 12px;
+            padding: 12px 16px;
+            background-color: var(--danger-bg);
+            border: 1px solid #fca5a5;
+            border-radius: var(--radius-sm);
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            color: #7f1d1d;
+            font-size: 0.92rem;
+            font-weight: 500;
+        }
+
+        .confirm-box.show {
+            display: flex;
+        }
+
+        .question-block {
+            margin-bottom: 16px;
+        }
+
+        .question-block label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+            color: var(--text-main);
+        }
+
+        .question-block textarea {
+            width: 100%;
+            min-height: 82px;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 0.94rem;
+            resize: vertical;
+            background-color: #ffffff;
+            color: var(--text-main);
+        }
+
+        .question-block textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 920px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+            .steps-grid {
+                grid-template-columns: 1fr;
+            }
+            .mode-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media print {
+            header.app-header {
+                background: #ffffff !important;
+                color: #000000 !important;
+                border-bottom: 2px solid #000000;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .card {
+                box-shadow: none;
+                border: 1px solid #94a3b8;
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="container header-inner">
+            <div class="badge-title">LABORATORIUM VIRTUAL FISIKA SMP</div>
+            <h1 class="app-title">DETEKTIF GAYA</h1>
+            <p class="app-subtitle">Laboratorium Virtual IPA Kelas VII</p>
+            <div class="objective-box">
+                <strong>Tujuan Pembelajaran:</strong> “Selidiki bagaimana besar dan arah gaya dapat mengubah gerak suatu benda.”
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="card">
+            <h2 class="section-title">Petunjuk Singkat</h2>
+            <div class="steps-grid">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-text">Pilih jenis percobaan pada kartu mode di bawah ini.</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-text">Atur gaya sesuai petunjuk, kemudian jalankan simulasi.</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-text">Amati perubahan gerak troli dan catat hasilnya ke tabel.</div>
+                </div>
+            </div>
+            <div class="glossary-bar">
+                <strong>Kamus Mini:</strong>
+                <span class="glossary-pill"><strong>Besar Gaya (N):</strong> Kuatnya dorongan/tarikan</span>
+                <span class="glossary-pill"><strong>Kelajuan (m/s):</strong> Cepatnya benda bergerak</span>
+                <span class="glossary-pill"><strong>Kecepatan (m/s):</strong> Kelajuan beserta arah geraknya</span>
+                <span class="glossary-pill"><strong>Percepatan (m/s²):</strong> Perubahan kecepatan tiap sekon</span>
+            </div>
+        </section>
+
+        <section class="mode-grid no-print" aria-label="Pilihan Mode Percobaan">
+            <div class="mode-card active" id="modeCard1">
+                <div>
+                    <span class="mode-tag">Mode 1</span>
+                    <h2>Mode 1 — Uji Besar Gaya</h2>
+                    <p>Selidiki bagaimana perbedaan besar gaya (2 N, 4 N, dan 6 N) memengaruhi percepatan dan kelajuan akhir troli ketika arah gaya tetap searah gerak awal.</p>
+                </div>
+                <button type="button" class="btn btn-primary" id="btnSelectMode1" onclick="switchMode(1)">
+                    Mulai Percobaan Mode 1
+                </button>
+            </div>
+
+            <div class="mode-card" id="modeCard2">
+                <div>
+                    <span class="mode-tag">Mode 2</span>
+                    <h2>Mode 2 — Uji Arah Gaya</h2>
+                    <p>Selidiki bagaimana perbedaan arah gaya (searah, tegak lurus, dan berlawanan arah) mengubah kelajuan, arah gerak, dan lintasan troli.</p>
+                </div>
+                <button type="button" class="btn btn-outline" id="btnSelectMode2" onclick="switchMode(2)">
+                    Mulai Percobaan Mode 2
+                </button>
+            </div>
+        </section>
+
+        <section class="card" id="experimentWorkspace">
+            <h2 class="section-title" id="workspaceTitle">Area Eksperimen: Mode 1 — Uji Besar Gaya</h2>
+            <p id="workspaceGoal" style="font-size: 0.93rem; color: var(--text-secondary); margin-bottom: 16px;">
+                Membandingkan pengaruh besar gaya terhadap perubahan gerak benda ketika arah gaya, massa, kecepatan awal, dan lama gaya bekerja tetap sama.
+            </p>
+
+            <div class="workspace-grid">
+                <!-- Left Column: Controls & Variables -->
+                <div>
+                    <h3 style="font-size: 0.96rem; font-weight: 700; margin-bottom: 8px; color: var(--text-main);">
+                        Pengaturan Tetap (Variabel Kontrol)
+                    </h3>
+                    <ul class="fixed-vars-list" id="fixedVarsList">
+                        <!-- Dynamically populated based on mode -->
+                    </ul>
+
+                    <!-- Mode 1 Variable Selector -->
+                    <div id="controlsMode1">
+                        <h3 style="font-size: 0.96rem; font-weight: 700; margin-bottom: 8px; color: var(--text-main);">
+                            Pilih Besar Gaya (Variabel Bebas):
+                        </h3>
+                        <div class="option-group">
+                            <button type="button" class="option-btn selected" id="btnForce2" onclick="selectForceMagnitude(2)">
+                                <div class="option-icon">
+                                    <svg width="26" height="16" viewBox="0 0 26 16" fill="none">
+                                        <line x1="2" y1="8" x2="16" y2="8" stroke="#ea580c" stroke-width="3" stroke-linecap="round"/>
+                                        <polygon points="15,3 23,8 15,13" fill="#ea580c"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <span class="option-title">2 N — Gaya Kecil</span>
+                                    <span class="option-desc">Dorongan kecil searah gerak awal</span>
+                                </div>
+                            </button>
+
+                            <button type="button" class="option-btn" id="btnForce4" onclick="selectForceMagnitude(4)">
+                                <div class="option-icon">
+                                    <svg width="32" height="16" viewBox="0 0 32 16" fill="none">
+                                        <line x1="2" y1="8" x2="21" y2="8" stroke="#ea580c" stroke-width="3.5" stroke-linecap="round"/>
+                                        <polygon points="20,2 30,8 20,14" fill="#ea580c"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <span class="option-title">4 N — Gaya Sedang</span>
+                                    <span class="option-desc">Dorongan sedang searah gerak awal</span>
+                                </div>
+                            </button>
+
+                            <button type="button" class="option-btn" id="btnForce6" onclick="selectForceMagnitude(6)">
+                                <div class="option-icon">
+                                    <svg width="38" height="16" viewBox="0 0 38 16" fill="none">
+                                        <line x1="2" y1="8" x2="26" y2="8" stroke="#ea580c" stroke-width="4" stroke-linecap="round"/>
+                                        <polygon points="25,1 36,8 25,15" fill="#ea580c"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <span class="option-title">6 N — Gaya Besar</span>
+                                    <span class="option-desc">Dorongan kuat searah gerak awal</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="controlsMode2" class="hidden">
+                        <h3 style="font-size: 0.96rem; font-weight: 700; margin-bottom: 8px; color: var(--text-main);">
+                            Pilih Arah Gaya (Variabel Bebas):
+                        </h3>
+                        <div class="option-group">
+                            <button type="button" class="option-btn selected" id="btnDir0" onclick="selectForceDirection(0)">
+                                <div class="option-icon">
+                                    <svg width="32" height="24" viewBox="0 0 32 24" fill="none">
+                                        <line x1="4" y1="12" x2="21" y2="12" stroke="#ea580c" stroke-width="3.5" stroke-linecap="round"/>
+                                        <polygon points="20,6 30,12 20,18" fill="#ea580c"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <span class="option-title">A. Searah gerak awal — 0°</span>
+                                    <span class="option-desc">Gaya mengarah ke kanan, searah dengan kecepatan awal.</span>
+                                </div>
+                            </button>
+
+                            <button type="button" class="option-btn" id="btnDir90" onclick="selectForceDirection(90)">
+                                <div class="option-icon">
+                                    <svg width="32" height="28" viewBox="0 0 32 28" fill="none">
+                                        <line x1="16" y1="24" x2="16" y2="10" stroke="#ea580c" stroke-width="3.5" stroke-linecap="round"/>
+                                        <polygon points="10,11 16,2 22,11" fill="#ea580c"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <span class="option-title">B. Tegak lurus terhadap gerak awal — 90°</span>
+                                    <span class="option-desc">Gaya mengarah ke atas pada bidang simulasi.</span>
+                                </div>
+                            </button>
+
+                            <button type="button" class="option-btn" id="btnDir180" onclick="selectForceDirection(180)">
+                                <div class="option-icon">
+                                    <svg width="32" height="24" viewBox="0 0 32 24" fill="none">
+                                        <line x1="28" y1="12" x2="11" y2="12" stroke="#ea580c" stroke-width="3.5" stroke-linecap="round"/>
+                                        <polygon points="12,6 2,12 12,18" fill="#ea580c"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <span class="option-title">C. Berlawanan arah dengan gerak awal — 180°</span>
+                                    <span class="option-desc">Gaya mengarah ke kiri, berlawanan dengan kecepatan awal.</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="control-actions no-print">
+                        <button type="button" class="btn btn-primary btn-full" id="btnRun" onclick="startSimulation()">
+                            ▶ Jalankan Percobaan
+                        </button>
+                        <button type="button" class="btn btn-warning" id="btnPauseResume" onclick="togglePauseSimulation()" disabled>
+                            ⏸ Jeda
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="btnReset" onclick="resetSimulation()">
+                            ↺ Ulangi
+                        </button>
+                        <button type="button" class="btn btn-success btn-full" id="btnRecord" onclick="recordExperimentResult()" disabled>
+                            ＋ Catat Hasil ke Tabel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Column: Visual Canvas, Legend, and Live/Final Results -->
+                <div>
+                    <div class="status-banner status-ready" id="statusBanner" role="status" aria-live="polite">
+                        <span id="statusText">Status: Siap melakukan percobaan.</span>
+                        <span id="timerDisplay" style="font-family: monospace; font-size: 1rem;">Waktu (t): 0,00 s / 3,00 s</span>
+                    </div>
+
+                    <div class="canvas-wrapper">
+                        <canvas id="simCanvas" width="720" height="360"></canvas>
+                    </div>
+
+                    <!-- Legend -->
+                    <div class="legend-bar">
+                        <div class="legend-item">
+                            <span class="legend-line" style="background-color: #ea580c;"></span>
+                            <span><strong>Panah Oranye:</strong> Gaya (arah &amp; besar relatif gaya)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-line" style="background-color: #0d9488;"></span>
+                            <span><strong>Panah Biru Kehijauan:</strong> Kecepatan (arah &amp; besar saat itu)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background-color: #1d4ed8;"></span>
+                            <span><strong>Titik Biru:</strong> Titik Awal (0 m) &amp; Jejak Tiap 1 s</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background-color: #15803d;"></span>
+                            <span><strong>Titik Hijau:</strong> Posisi Akhir (t = 3 s)</span>
+                        </div>
+                    </div>
+
+                    <p class="model-note">
+                        “Simulasi ini menggunakan model sederhana. Gesekan diabaikan agar pengaruh besar dan arah gaya dapat diamati secara lebih jelas.”
+                    </p>
+
+                    <!-- Hasil Numerik Percobaan -->
+                    <div class="result-summary-box" id="resultSummaryBox">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                            <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-main);" id="resultBoxTitle">
+                                Data Pengamatan Saat Ini (Keadaan Awal t = 0 s)
+                            </h3>
+                        </div>
+                        <div class="result-grid" id="resultMetricsGrid">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                        <div class="result-explanation" id="resultExplanationText">
+                            Pilih pengaturan gaya di panel kiri, lalu tekan tombol <strong>“Jalankan Percobaan”</strong> untuk mengamati perubahan gerak troli selama 3 sekon.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div id="sectionMode1Details">
+            <section class="card">
+                <div class="table-header-row">
+                    <h2 class="section-title" style="margin-bottom: 0;">Tabel Hasil Percobaan Mode 1 — Uji Besar Gaya</h2>
+                    <div class="table-actions no-print">
+                        <button type="button" class="btn btn-outline" onclick="exportTableCSV(1)">Unduh CSV</button>
+                        <button type="button" class="btn btn-outline" onclick="window.print()">Cetak Hasil</button>
+                        <button type="button" class="btn btn-danger-outline" onclick="requestClearData(1)">Hapus Semua Data</button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="data-table" id="tableMode1">
+                        <thead>
+                            <tr>
+                                <th>No. Percobaan</th>
+                                <th>Besar Gaya</th>
+                                <th>Percepatan</th>
+                                <th>Kelajuan Awal</th>
+                                <th>Kelajuan Akhir</th>
+                                <th>Perubahan Gerak</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyMode1">
+                            <tr>
+                                <td colspan="6" class="empty-table-msg">
+                                    Belum ada data tercatat. Jalankan percobaan Mode 1 lalu tekan tombol “Catat Hasil ke Tabel”.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Confirmation box for clearing Mode 1 data -->
+                <div class="confirm-box no-print" id="confirmBoxMode1">
+                    <span>Apakah kamu yakin ingin menghapus semua data pada Tabel Mode 1 untuk mengulang investigasi?</span>
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" class="btn btn-primary" style="background-color: var(--danger);" onclick="confirmClearData(1)">Ya, Hapus Data</button>
+                        <button type="button" class="btn btn-secondary" onclick="cancelClearData(1)">Batal</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2 class="section-title">Pertanyaan Analisis Mode 1 — Besar Gaya</h2>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 14px;">
+                    Jawablah pertanyaan berikut berdasarkan pengamatan dan data yang telah kamu catat pada Tabel Mode 1.
+                </p>
+
+                <div class="question-block">
+                    <label for="ansM1Q1">1. Apa perbedaan perubahan gerak ketika benda diberi gaya 2 N, 4 N, dan 6 N?</label>
+                    <textarea id="ansM1Q1" placeholder="Tuliskan hasil pengamatanmu di sini..."></textarea>
+                </div>
+
+                <div class="question-block">
+                    <label for="ansM1Q2">2. Ketika arah gaya dan kondisi lainnya tetap, bagaimana perubahan besar gaya memengaruhi percepatan benda?</label>
+                    <textarea id="ansM1Q2" placeholder="Tuliskan analisis hubungan antara besar gaya dan percepatan benda..."></textarea>
+                </div>
+
+                <div class="question-block" style="margin-bottom: 0;">
+                    <label for="ansM1Q3">3. Apa bukti dari tabel hasil yang mendukung jawabanmu?</label>
+                    <textarea id="ansM1Q3" placeholder="Sebutkan angka atau perbandingan data dari tabel pengamatanmu..."></textarea>
+                </div>
+            </section>
+        </div>
+
+        <div id="sectionMode2Details" class="hidden">
+            <section class="card">
+                <div class="table-header-row">
+                    <h2 class="section-title" style="margin-bottom: 0;">Tabel Hasil Percobaan Mode 2 — Uji Arah Gaya</h2>
+                    <div class="table-actions no-print">
+                        <button type="button" class="btn btn-outline" onclick="exportTableCSV(2)">Unduh CSV</button>
+                        <button type="button" class="btn btn-outline" onclick="window.print()">Cetak Hasil</button>
+                        <button type="button" class="btn btn-danger-outline" onclick="requestClearData(2)">Hapus Semua Data</button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="data-table" id="tableMode2">
+                        <thead>
+                            <tr>
+                                <th>No. Percobaan</th>
+                                <th>Arah Gaya</th>
+                                <th>Kelajuan Awal</th>
+                                <th>Kelajuan Akhir</th>
+                                <th>Arah Gerak Akhir</th>
+                                <th>Perubahan Gerak yang Diamati</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyMode2">
+                            <tr>
+                                <td colspan="6" class="empty-table-msg">
+                                    Belum ada data tercatat. Jalankan percobaan Mode 2 lalu tekan tombol “Catat Hasil ke Tabel”.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Confirmation box for clearing Mode 2 data -->
+                <div class="confirm-box no-print" id="confirmBoxMode2">
+                    <span>Apakah kamu yakin ingin menghapus semua data pada Tabel Mode 2 untuk mengulang investigasi?</span>
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" class="btn btn-primary" style="background-color: var(--danger);" onclick="confirmClearData(2)">Ya, Hapus Data</button>
+                        <button type="button" class="btn btn-secondary" onclick="cancelClearData(2)">Batal</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2 class="section-title">Pertanyaan Analisis Mode 2 — Arah Gaya</h2>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 14px;">
+                    Jawablah pertanyaan berikut berdasarkan pengamatan dan data yang telah kamu catat pada Tabel Mode 2.
+                </p>
+
+                <div class="question-block">
+                    <label for="ansM2Q1">1. Apa yang terjadi ketika gaya searah dengan gerak awal?</label>
+                    <textarea id="ansM2Q1" placeholder="Tuliskan apa yang terjadi pada kelajuan dan arah gerak troli..."></textarea>
+                </div>
+
+                <div class="question-block">
+                    <label for="ansM2Q2">2. Apa perbedaan yang kamu amati ketika gaya tegak lurus terhadap gerak awal?</label>
+                    <textarea id="ansM2Q2" placeholder="Tuliskan bagaimana lintasan, arah gerak akhir, dan kelajuan troli berubah..."></textarea>
+                </div>
+
+                <div class="question-block">
+                    <label for="ansM2Q3">3. Apa yang terjadi ketika gaya berlawanan arah dengan gerak awal?</label>
+                    <textarea id="ansM2Q3" placeholder="Jelaskan urutan gerak troli mulai dari melambat, berhenti sesaat, hingga berbalik arah..."></textarea>
+                </div>
+
+                <div class="question-block" style="margin-bottom: 0;">
+                    <label for="ansM2Q4">4. Berdasarkan hasil percobaan, bagaimana arah gaya memengaruhi perubahan gerak benda?</label>
+                    <textarea id="ansM2Q4" placeholder="Tuliskan analisis lengkapmu berdasarkan ketiga arah gaya yang diuji..."></textarea>
+                </div>
+            </section>
+        </div>
+
+        <section class="card">
+            <h2 class="section-title">Kesimpulan Detektif Gaya</h2>
+            <p class="model-note" style="margin-top: 0; margin-bottom: 16px; border-left-color: var(--primary); background-color: var(--bg-subtle); color: #1e3a8a;">
+                <strong>Pengingat:</strong> “Gunakan hasil percobaan dan tabel pengamatan untuk mendukung kesimpulanmu.”
+            </p>
+
+            <div class="question-block">
+                <label for="conclusion1">1. “Ketika besar gaya bertambah, sedangkan massa dan kondisi lainnya tetap, maka ....”</label>
+                <textarea id="conclusion1" placeholder="Lanjutkan kalimat kesimpulan pertama berdasarkan bukti dari Mode 1..."></textarea>
+            </div>
+
+            <div class="question-block" style="margin-bottom: 0;">
+                <label for="conclusion2">2. “Ketika arah gaya diubah, perubahan gerak benda dapat berupa ....”</label>
+                <textarea id="conclusion2" placeholder="Lanjutkan kalimat kesimpulan kedua berdasarkan bukti dari Mode 2..."></textarea>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        /* Konstanta Model Fisika Sesuai Spesifikasi */
+        const PHYSICS_CONSTANTS = {
+            mass: 2,            // kg
+            v0x: 4,             // m/s ke kanan
+            v0y: 0,             // m/s
+            durationSim: 3.0,   // sekon simulasi
+            durationReal: 4.5   // detik animasi visual di layar agar nyaman diamati
+        };
+
+        /* State Aplikasi */
+        const appState = {
+            currentMode: 1,             // 1 = Uji Besar Gaya, 2 = Uji Arah Gaya
+            selectedForceMag: 2,        // Mode 1: 2, 4, atau 6 N
+            selectedForceAngle: 0,      // Mode 2: 0, 90, atau 180 derajat
+            simStatus: 'ready',         // 'ready' | 'running' | 'paused' | 'finished'
+            simTime: 0.0,               // Waktu simulasi saat ini (0.00 s.d. 3.00 s)
+            lastFrameTimestamp: null,
+            animFrameId: null,
+            currentRunRecorded: false,
+            recordsMode1: [],
+            recordsMode2: []
+        };
+
+        function formatNumberID(num, maxDecimals = 2) {
+            const rounded = Math.round((num + Number.EPSILON) * 100) / 100;
+            if (Number.isInteger(rounded)) {
+                return rounded.toString();
+            }
+            return rounded.toFixed(maxDecimals).replace(/\.?0+$/, '').replace('.', ',');
+        }
+
+        function getActiveParameters() {
+            const m = PHYSICS_CONSTANTS.mass;
+            const v0x = PHYSICS_CONSTANTS.v0x;
+            const v0y = PHYSICS_CONSTANTS.v0y;
+            const F = appState.currentMode === 1 ? appState.selectedForceMag : 4;
+            const angleDeg = appState.currentMode === 1 ? 0 : appState.selectedForceAngle;
+
+            let Fx = 0;
+            let Fy = 0;
+            if (angleDeg === 0) {
+                Fx = F;
+                Fy = 0;
+            } else if (angleDeg === 90) {
+                Fx = 0;
+                Fy = F;
+            } else if (angleDeg === 180) {
+                Fx = -F;
+                Fy = 0;
+            }
+
+            const ax = Fx / m;
+            const ay = Fy / m;
+
+            return { m, v0x, v0y, F, angleDeg, Fx, Fy, ax, ay };
+        }
+
+        function calculateKinematicsAtTime(t) {
+            const params = getActiveParameters();
+            const clampedT = Math.max(0, Math.min(t, PHYSICS_CONSTANTS.durationSim));
+
+            // Kecepatan pada tiap sumbu: v = v0 + a * t
+            const vx = params.v0x + params.ax * clampedT;
+            const vy = params.v0y + params.ay * clampedT;
+
+            // Perpindahan pada tiap sumbu: s = v0 * t + 1/2 * a * t^2
+            const sx = params.v0x * clampedT + 0.5 * params.ax * clampedT * clampedT;
+            const sy = params.v0y * clampedT + 0.5 * params.ay * clampedT * clampedT;
+
+            // Kelajuan (besar vektor kecepatan): v = sqrt(vx^2 + vy^2)
+            const speed = Math.sqrt(vx * vx + vy * vy);
+            const accelMag = Math.sqrt(params.ax * params.ax + params.ay * params.ay);
+
+            return {
+                t: clampedT,
+                ...params,
+                vx,
+                vy,
+                sx,
+                sy,
+                speed,
+                accelMag
+            };
+        }
+
+        function getMotionDescriptions(kinState) {
+            if (appState.currentMode === 1) {
+                if (kinState.F === 2) {
+                    return {
+                        directionLabel: 'Ke kanan (searah gerak awal)',
+                        shortChange: 'Gerak tetap ke kanan dan bertambah cepat (kelajuan naik dari 4 m/s menjadi 7 m/s).',
+                        detailedNote: 'Gaya 2 N ke kanan menghasilkan percepatan 1 m/s². Troli tetap bergerak ke kanan dengan peningkatan kelajuan paling kecil.'
+                    };
+                } else if (kinState.F === 4) {
+                    return {
+                        directionLabel: 'Ke kanan (searah gerak awal)',
+                        shortChange: 'Gerak tetap ke kanan dan bertambah lebih cepat (kelajuan naik dari 4 m/s menjadi 10 m/s).',
+                        detailedNote: 'Gaya 4 N ke kanan menghasilkan percepatan 2 m/s². Troli bergerak makin cepat dan menempuh perpindahan 21 m.'
+                    };
+                } else {
+                    return {
+                        directionLabel: 'Ke kanan (searah gerak awal)',
+                        shortChange: 'Gerak tetap ke kanan dan bertambah paling cepat (kelajuan naik dari 4 m/s menjadi 13 m/s).',
+                        detailedNote: 'Gaya 6 N ke kanan menghasilkan percepatan terbesar (3 m/s²). Troli mengalami peningkatan kelajuan terbesar dan perpindahan terjauh (25,5 m).'
+                    };
+                }
+            } else {
+                if (kinState.angleDeg === 0) {
+                    return {
+                        forceDirLabel: 'Searah gerak awal (0° — ke kanan)',
+                        finalDirLabel: 'Ke kanan (searah gerak awal)',
+                        shortChange: 'Gerak tetap lurus ke kanan dan menjadi lebih cepat (kelajuan bertambah dari 4 m/s menjadi 10 m/s).',
+                        detailedNote: 'Gaya searah gerak awal memberikan percepatan horizontal +2 m/s². Troli tetap bergerak lurus ke kanan dan makin cepat.'
+                    };
+                } else if (kinState.angleDeg === 90) {
+                    return {
+                        forceDirLabel: 'Tegak lurus gerak awal (90° — ke atas)',
+                        finalDirLabel: 'Menyimpang ke kanan atas (±56,3° ke atas dari arah gerak awal)',
+                        shortChange: 'Lintasan melengkung ke atas, arah gerak berbelok ke kanan atas, dan kelajuan bertambah menjadi 7,21 m/s.',
+                        detailedNote: 'Kecepatan horizontal tetap 4 m/s, sedangkan kecepatan vertikal bertambah menjadi 6 m/s ke atas. Akibatnya arah gerak menyimpang ke atas.'
+                    };
+                } else {
+                    return {
+                        forceDirLabel: 'Berlawanan arah gerak awal (180° — ke kiri)',
+                        finalDirLabel: 'Ke kiri (berbalik arah 180° dari gerak awal)',
+                        shortChange: 'Mula-mula bergerak ke kanan, melambat, berhenti sesaat pada t = 2 s (di +4 m), lalu berbalik bergerak ke kiri.',
+                        detailedNote: 'Percepatan horizontal −2 m/s² mengurangi kecepatan troli hingga berhenti sesaat pada t = 2 s (posisi +4 m), lalu berbalik ke kiri hingga posisi akhir +3 m dengan kecepatan akhir −2 m/s (kelajuan 2 m/s ke kiri).'
+                    };
+                }
+            }
+        }
+
+        function renderFixedVariables() {
+            const listEl = document.getElementById('fixedVarsList');
+            if (appState.currentMode === 1) {
+                listEl.innerHTML = `
+                    <li><span class="var-label">Massa benda (m):</span> <span class="var-val">2 kg</span></li>
+                    <li><span class="var-label">Kecepatan awal (v awal):</span> <span class="var-val">4 m/s ke kanan</span></li>
+                    <li><span class="var-label">Arah gaya:</span> <span class="var-val">Ke kanan (searah gerak awal)</span></li>
+                    <li><span class="var-label">Lama gaya bekerja (t):</span> <span class="var-val">3 sekon</span></li>
+                `;
+            } else {
+                listEl.innerHTML = `
+                    <li><span class="var-label">Massa benda (m):</span> <span class="var-val">2 kg</span></li>
+                    <li><span class="var-label">Kecepatan awal (v awal):</span> <span class="var-val">4 m/s ke kanan</span></li>
+                    <li><span class="var-label">Besar gaya (F):</span> <span class="var-val">4 N</span></li>
+                    <li><span class="var-label">Lama gaya bekerja (t):</span> <span class="var-val">3 sekon</span></li>
+                `;
+            }
+        }
+
+        function setStatusBanner(type, message) {
+            const banner = document.getElementById('statusBanner');
+            const textEl = document.getElementById('statusText');
+            banner.className = 'status-banner status-' + type;
+            textEl.textContent = 'Status: ' + message;
+        }
+
+        function updateControlButtonsState() {
+            const isIdle = appState.simStatus === 'ready' || appState.simStatus === 'finished';
+            const isRunning = appState.simStatus === 'running';
+            const isPaused = appState.simStatus === 'paused';
+            const isFinished = appState.simStatus === 'finished';
+
+            // Lock variable option buttons when simulation is running or paused
+            const optionBtns = document.querySelectorAll('.option-btn');
+            optionBtns.forEach(btn => {
+                btn.disabled = !isIdle;
+            });
+
+            document.getElementById('btnRun').disabled = isRunning || isPaused;
+
+            const pauseBtn = document.getElementById('btnPauseResume');
+            pauseBtn.disabled = !(isRunning || isPaused);
+            pauseBtn.textContent = isPaused ? '▶ Lanjutkan' : '⏸ Jeda';
+
+            document.getElementById('btnRecord').disabled = !(isFinished && !appState.currentRunRecorded);
+        }
+
+        function updateNumericalSummary() {
+            const kin = calculateKinematicsAtTime(appState.simTime);
+            const desc = getMotionDescriptions(kin);
+            const isFinished = appState.simStatus === 'finished';
+
+            const titleEl = document.getElementById('resultBoxTitle');
+            const gridEl = document.getElementById('resultMetricsGrid');
+            const expEl = document.getElementById('resultExplanationText');
+            const timerEl = document.getElementById('timerDisplay');
+
+            timerEl.textContent = `Waktu (t): ${formatNumberID(kin.t, 2)} s / 3,00 s`;
+
+            if (appState.simStatus === 'ready') {
+                titleEl.textContent = 'Data Pengamatan (Keadaan Awal sebelum Gaya Bekerja)';
+            } else if (isFinished) {
+                titleEl.textContent = 'Hasil Akhir Percobaan (Setelah Gaya Bekerja Selama 3 s)';
+            } else {
+                titleEl.textContent = `Data Sementara Saat Simulasi Berjalan (t = ${formatNumberID(kin.t, 2)} s)`;
+            }
+
+            if (appState.currentMode === 1) {
+                gridEl.innerHTML = `
+                    <div class="result-metric">
+                        <span class="metric-label">Besar Gaya (F)</span>
+                        <span class="metric-value">${kin.F} N (ke kanan)</span>
+                    </div>
+                    <div class="result-metric">
+                        <span class="metric-label">Massa Benda (m)</span>
+                        <span class="metric-value">${kin.m} kg</span>
+                    </div>
+                    <div class="result-metric">
+                        <span class="metric-label">Kecepatan Awal</span>
+                        <span class="metric-value">4 m/s ke kanan</span>
+                    </div>
+                    <div class="result-metric">
+                        <span class="metric-label">Percepatan (a = F / m)</span>
+                        <span class="metric-value">${formatNumberID(kin.ax)} m/s²</span>
+                    </div>
+                    <div class="result-metric">
+                        <span class="metric-label">${isFinished ? 'Kelajuan Akhir' : 'Kelajuan Saat Ini'}</span>
+                        <span class="metric-value">${formatNumberID(kin.speed)} m/s (ke kanan)</span>
+                    </div>
+                    <div class="result-metric">
+                        <span class="metric-label">Perpindahan Horizontal (s)</span>
+                        <span class="metric-value">${formatNumberID(kin.sx)} m</span>
+                    </div>
+                `;
+                expEl.innerHTML = isFinished
+                    ? `<strong>Keterangan Perubahan Gerak:</strong> ${desc.shortChange} ${desc.detailedNote}`
+                    : `Tekan <strong>“Jalankan Percobaan”</strong> untuk melihat troli dipercepat oleh gaya sebesar <strong>${kin.F} N</strong> selama 3 sekon.`;
+            } else {
+                let accelText = '';
+                if (kin.angleDeg === 0) accelText = '+2 m/s² (horizontal ke kanan)';
+                else if (kin.angleDeg === 90) accelText = 'ax = 0 m/s², ay = +2 m/s² (ke atas)';
+                else accelText = '−2 m/s² (horizontal ke kiri)';
+
+                let posText = '';
+                if (kin.angleDeg === 90) {
+                    posText = `Horizontal +${formatNumberID(kin.sx)} m, Vertikal +${formatNumberID(kin.sy)} m`;
+                } else {
+                    const sign = kin.sx >= 0 ? '+' : '';
+                    posText = `Horizontal ${sign}${formatNumberID(kin.sx)} m dari titik awal`;
+                }
+
+                let instantDirText = 'Ke kanan';
+                if (kin.angleDeg === 90 && kin.t > 0) {
+                    instantDirText = isFinished ? desc.finalDirLabel : 'Berbelok ke kanan atas';
+                } else if (kin.angleDeg === 180) {
+                    if (Math.abs(kin.vx) < 0.05) instantDirText = 'Berhenti sesaat (v = 0 m/s)';
+                    else if (kin.vx < 0) instantDirText = 'Ke kiri (berbalik arah)';
+                    else instantDirText = 'Ke kanan (sedang melambat)';
+                }
+
+                gridEl.innerHTML = `
+                    <div class="result-metric">
+                        <span class="metric-label">Arah Gaya</span>
+                        <span class="metric-value">${desc.forceDirLabel}</span>
+                    </div>
+                    <div class="result-metric">
+                        <span class="metric-label">Besar Gaya (F)</span>
+                        <span class="metric-value">${kin.F} N</span>
+                    </div>
+                    <div class="result-metric">
+                        <span class="metric-label">Kecepatan Awal</span>
+                        <span class="metric-value">4 m/s ke kanan</span>
+                    </div>
+                    <div class="result-metric">
+                        <span class="metric-label">${isFinished ? 'Kelajuan Akhir' : 'Kelajuan Saat Ini'}</span>
+                        <span class="metric-value">${formatNumberID(kin.speed)} m/s ${kin.angleDeg === 90 && isFinished ? `(vx=4, vy=6 m/s)` : (kin.angleDeg === 180 && isFinished ? `(vx = −2 m/s)` : '')}</span>
+                    </div>
+                    <div class="result-metric">
+                        <span class="metric-label">${isFinished ? 'Arah Kecepatan Akhir' : 'Arah Gerak Saat Ini'}</span>
+                        <span class="metric-value">${instantDirText}</span>
+                    </div>
+                    <div class="result-metric">
+                        <span class="metric-label">Percepatan (a)</span>
+                        <span class="metric-value">${accelText}</span>
+                    </div>
+                    <div class="result-metric" style="grid-column: span 2;">
+                        <span class="metric-label">${isFinished ? 'Posisi Akhir Relatif terhadap Titik Awal' : 'Posisi Relatif terhadap Titik Awal'}</span>
+                        <span class="metric-value">${posText}</span>
+                    </div>
+                `;
+                expEl.innerHTML = isFinished
+                    ? `<strong>Penjelasan Perubahan Gerak:</strong> ${desc.shortChange} ${desc.detailedNote}`
+                    : `Tekan <strong>“Jalankan Percobaan”</strong> untuk mengamati lintasan, panah gaya, dan panah kecepatan pada arah <strong>${desc.forceDirLabel}</strong>.`;
+            }
+        }
+
+        function drawVectorArrow(ctx, x1, y1, x2, y2, color, label) {
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const len = Math.sqrt(dx * dx + dy * dy);
+            if (len < 3) return;
+
+            const angle = Math.atan2(dy, dx);
+            const headLen = Math.min(11, Math.max(7, len * 0.28));
+
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = 3.2;
+            ctx.lineCap = 'round';
+
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(x2, y2);
+            ctx.lineTo(x2 - headLen * Math.cos(angle - Math.PI / 6), y2 - headLen * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(x2 - headLen * Math.cos(angle + Math.PI / 6), y2 - headLen * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+
+            if (label) {
+                const canvasEl = document.getElementById('simCanvas');
+                const fontSize = rFont(canvasEl, 14);
+                ctx.font = `bold ${fontSize}px system-ui, sans-serif`;
+                const labelOffsetX = Math.cos(angle) * 10;
+                const labelOffsetY = Math.sin(angle) * 10 - 8;
+                ctx.fillText(label, x2 + labelOffsetX - 8, y2 + labelOffsetY);
+            }
+            ctx.restore();
+        }
+
+        function drawTrolley(ctx, cx, cy, angleRad) {
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(angleRad);
+
+            // Roda troli (4 roda)
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(-16, -15, 9, 4);
+            ctx.fillRect(7, -15, 9, 4);
+            ctx.fillRect(-16, 11, 9, 4);
+            ctx.fillRect(7, 11, 9, 4);
+
+            // Badan utama troli
+            ctx.fillStyle = '#2563eb';
+            ctx.strokeStyle = '#1e3a8a';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(-22, -12, 44, 24, 6);
+            ctx.fill();
+            ctx.stroke();
+
+            // Penanda bagian depan troli
+            ctx.fillStyle = '#93c5fd';
+            ctx.beginPath();
+            ctx.moveTo(10, -8);
+            ctx.lineTo(19, 0);
+            ctx.lineTo(10, 8);
+            ctx.closePath();
+            ctx.fill();
+
+            // Label massa
+            ctx.rotate(-angleRad);
+            ctx.fillStyle = '#ffffff';
+            const canvasEl = document.getElementById('simCanvas');
+            ctx.font = `bold ${rFont(canvasEl, 11)}px system-ui, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('2 kg', 0, 0);
+
+            ctx.restore();
+        }
+
+        /* ===== Responsive Canvas Sizing ===== */
+        function resizeCanvas() {
+            const canvas = document.getElementById('simCanvas');
+            const wrapper = canvas.parentElement;
+            const displayWidth = wrapper.clientWidth;
+            // Maintain a minimum aspect ratio so nothing gets squished
+            const displayHeight = Math.max(300, Math.round(displayWidth * 0.55));
+            const dpr = window.devicePixelRatio || 1;
+
+            canvas.width = Math.round(displayWidth * dpr);
+            canvas.height = Math.round(displayHeight * dpr);
+            canvas.style.height = displayHeight + 'px';
+
+            const ctx = canvas.getContext('2d');
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            // Store logical dimensions for the drawing functions
+            canvas._logicalWidth = displayWidth;
+            canvas._logicalHeight = displayHeight;
+        }
+
+        // Compute responsive font size: base is proportional to canvas width
+        function rFont(canvas, basePx) {
+            // Reference width is 720px (original design). Scale proportionally.
+            const ratio = canvas._logicalWidth / 720;
+            // Clamp so text doesn't get absurdly small on tiny screens or huge on 4K
+            const scaled = basePx * Math.max(0.85, Math.min(ratio, 1.6));
+            return Math.round(scaled * 10) / 10;
+        }
+
+        function renderSimulationCanvas() {
+            const canvas = document.getElementById('simCanvas');
+            // Ensure canvas is sized to its container
+            resizeCanvas();
+            const ctx = canvas.getContext('2d');
+            const width = canvas._logicalWidth;
+            const height = canvas._logicalHeight;
+
+            ctx.clearRect(0, 0, width * 2, height * 2);
+
+            // Koordinat layar: titik awal (0, 0) meter
+            // Skala proporsional: pada 720px lebar → scale = 20px/m; skala menyesuaikan lebar canvas
+            const scale = width / 36;
+            const originX = Math.round(width * 0.132);
+            const originY = appState.currentMode === 2 && appState.selectedForceAngle === 90
+                ? Math.round(height * 0.82)
+                : Math.round(height * 0.58);
+
+            const toScreenX = (mX) => originX + mX * scale;
+            const toScreenY = (mY) => originY - mY * scale;
+
+            // 1. Gambar grid koordinat meter
+            ctx.save();
+            ctx.strokeStyle = '#f1f5f9';
+            ctx.lineWidth = 1;
+            for (let gx = -2; gx <= 28; gx += 2) {
+                const sx = toScreenX(gx);
+                ctx.beginPath();
+                ctx.moveTo(sx, 20);
+                ctx.lineTo(sx, height - 25);
+                ctx.stroke();
+            }
+            for (let gy = -6; gy <= 12; gy += 2) {
+                const sy = toScreenY(gy);
+                if (sy >= 20 && sy <= height - 25) {
+                    ctx.beginPath();
+                    ctx.moveTo(30, sy);
+                    ctx.lineTo(width - 20, sy);
+                    ctx.stroke();
+                }
+            }
+
+            // Sumbu X dan Y acuan melalui titik awal
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(30, originY);
+            ctx.lineTo(width - 20, originY);
+            ctx.moveTo(originX, 20);
+            ctx.lineTo(originX, height - 25);
+            ctx.stroke();
+
+            // Angka skala sumbu horizontal (meter)
+            ctx.fillStyle = '#64748b';
+            ctx.font = `${rFont(canvas, 13)}px system-ui, sans-serif`;
+            ctx.textAlign = 'center';
+            for (let m = 0; m <= 26; m += 5) {
+                const sx = toScreenX(m);
+                ctx.fillText(m + ' m', sx, originY + Math.round(height * 0.08));
+                ctx.beginPath();
+                ctx.moveTo(sx, originY - 4);
+                ctx.lineTo(sx, originY + 4);
+                ctx.stroke();
+            }
+            if (appState.currentMode === 2 && appState.selectedForceAngle === 90) {
+                ctx.textAlign = 'right';
+                for (let my = 3; my <= 9; my += 3) {
+                    const sy = toScreenY(my);
+                    ctx.fillText('+' + my + ' m', originX - 8, sy + 4);
+                }
+            }
+            ctx.restore();
+
+            // 2. Indikator Arah Gerak Awal di Titik Awal
+            ctx.save();
+            ctx.fillStyle = '#475569';
+            ctx.font = `${rFont(canvas, 13)}px system-ui, sans-serif`;
+            ctx.fillText('Arah Gerak Awal (v awal = 4 m/s →)', originX + 4, originY - Math.round(height * 0.07));
+            ctx.restore();
+
+            // 3. Gambar Jejak Lintasan Gerak (dari t = 0 sampai simTime)
+            const kinNow = calculateKinematicsAtTime(appState.simTime);
+            if (appState.simTime > 0) {
+                ctx.save();
+                ctx.strokeStyle = '#3b82f6';
+                ctx.lineWidth = 2.5;
+                ctx.setLineDash([5, 4]);
+                ctx.beginPath();
+
+                const steps = 60;
+                for (let i = 0; i <= steps; i++) {
+                    const sampleT = (appState.simTime * i) / steps;
+                    const pt = calculateKinematicsAtTime(sampleT);
+                    const px = toScreenX(pt.sx);
+                    const py = toScreenY(pt.sy);
+                    if (i === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Titik jejak setiap 1 sekon (t = 1 s, 2 s, 3 s)
+                for (let sec = 1; sec <= Math.floor(appState.simTime + 0.001); sec++) {
+                    const ptSec = calculateKinematicsAtTime(sec);
+                    const px = toScreenX(ptSec.sx);
+                    const py = toScreenY(ptSec.sy);
+                    ctx.fillStyle = '#1d4ed8';
+                    ctx.beginPath();
+                    ctx.arc(px, py, 4.5, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = '#1e3a8a';
+                    ctx.font = `${rFont(canvas, 12)}px system-ui, sans-serif`;
+                    const yOffset = (kinNow.angleDeg === 180 && sec === 2) ? -14 : 16;
+                    ctx.fillText(`t=${sec}s`, px - 12, py + yOffset);
+                }
+
+                // Penanda khusus titik balik saat gaya 180 derajat (berhenti sesaat pada t = 2 s di +4 m)
+                if (kinNow.angleDeg === 180 && appState.simTime >= 2.0) {
+                    const turnX = toScreenX(4);
+                    const turnY = toScreenY(0);
+                    ctx.fillStyle = '#b45309';
+                    ctx.font = `bold ${rFont(canvas, 13)}px system-ui, sans-serif`;
+                    ctx.fillText('Berhenti sesaat (t = 2 s, posisi +4 m)', turnX - 55, turnY - 26);
+                }
+                ctx.restore();
+            }
+
+            // 4. Penanda Titik Awal (0 m)
+            ctx.save();
+            ctx.fillStyle = '#1d4ed8';
+            ctx.beginPath();
+            ctx.arc(originX, originY, 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.font = `bold ${rFont(canvas, 13)}px system-ui, sans-serif`;
+            ctx.fillText('Titik Awal (0 m)', originX - 38, originY + Math.round(height * 0.13));
+            ctx.restore();
+
+            // 5. Gambar Benda (Troli) pada posisi saat ini
+            const trolleyX = toScreenX(kinNow.sx);
+            const trolleyY = toScreenY(kinNow.sy);
+            let trolleyAngle = 0;
+            if (kinNow.angleDeg === 90 && (Math.abs(kinNow.vx) > 0.01 || Math.abs(kinNow.vy) > 0.01)) {
+                trolleyAngle = Math.atan2(-kinNow.vy, kinNow.vx);
+            }
+            drawTrolley(ctx, trolleyX, trolleyY, trolleyAngle);
+
+            // 6. Gambar Panah Kecepatan (Biru Kehijauan / Teal)
+            // Skala visual panah kecepatan: proporsional terhadap lebar canvas
+            const vScale = width / 85;
+            if (kinNow.speed > 0.05) {
+                const vxEnd = trolleyX + kinNow.vx * vScale;
+                const vyEnd = trolleyY - kinNow.vy * vScale;
+                drawVectorArrow(
+                    ctx,
+                    trolleyX,
+                    trolleyY - 16,
+                    vxEnd,
+                    vyEnd - 16,
+                    '#0d9488',
+                    `v = ${formatNumberID(kinNow.speed)} m/s`
+                );
+            } else {
+                ctx.save();
+                ctx.fillStyle = '#0d9488';
+                ctx.font = `bold ${rFont(canvas, 14)}px system-ui, sans-serif`;
+                ctx.fillText('v = 0 m/s (Berhenti sesaat)', trolleyX - 50, trolleyY - 22);
+                ctx.restore();
+            }
+
+            // 7. Gambar Panah Gaya (Oranye)
+            // Skala visual panah gaya: proporsional terhadap lebar canvas
+            const fScale = width / 51.4;
+            const fxEnd = trolleyX + kinNow.Fx * fScale;
+            const fyEnd = trolleyY - kinNow.Fy * fScale;
+            const forceStartY = kinNow.angleDeg === 90 ? trolleyY : trolleyY + 16;
+            const forceEndY = kinNow.angleDeg === 90 ? fyEnd : fyEnd + 16;
+            drawVectorArrow(
+                ctx,
+                trolleyX,
+                forceStartY,
+                fxEnd,
+                forceEndY,
+                '#ea580c',
+                `F = ${kinNow.F} N`
+            );
+
+            // 8. Penanda Posisi Akhir & Arah Gerak Akhir setelah percobaan selesai (t = 3 s)
+            if (appState.simStatus === 'finished') {
+                ctx.save();
+                ctx.fillStyle = '#15803d';
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(trolleyX, trolleyY, 7, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                const desc = getMotionDescriptions(kinNow);
+                ctx.fillStyle = '#15803d';
+                ctx.font = `bold ${rFont(canvas, 14)}px system-ui, sans-serif`;
+                const labelPosText = kinNow.angleDeg === 90
+                    ? `Posisi Akhir (+${formatNumberID(kinNow.sx)} m, +${formatNumberID(kinNow.sy)} m)`
+                    : `Posisi Akhir (${kinNow.sx >= 0 ? '+' : ''}${formatNumberID(kinNow.sx)} m)`;
+
+                const textX = Math.min(width - 210, Math.max(20, trolleyX - 65));
+                const textY = kinNow.angleDeg === 90 ? trolleyY - 38 : trolleyY + 48;
+                ctx.fillText(labelPosText, textX, textY);
+                ctx.fillStyle = '#0f172a';
+                ctx.font = `${rFont(canvas, 13)}px system-ui, sans-serif`;
+                ctx.fillText(`Arah Akhir: ${appState.currentMode === 1 ? desc.directionLabel : desc.finalDirLabel}`, textX, textY + 15);
+                ctx.restore();
+            }
+        }
+
+        function animationStep(timestamp) {
+            if (appState.simStatus !== 'running') return;
+
+            if (!appState.lastFrameTimestamp) {
+                appState.lastFrameTimestamp = timestamp;
+            }
+
+            const deltaRealSeconds = (timestamp - appState.lastFrameTimestamp) / 1000;
+            appState.lastFrameTimestamp = timestamp;
+
+            // Penskalaan waktu: 3.0 sekon waktu simulasi ditampilkan dalam 4.5 detik waktu layar
+            const timeScale = PHYSICS_CONSTANTS.durationSim / PHYSICS_CONSTANTS.durationReal;
+            appState.simTime += deltaRealSeconds * timeScale;
+
+            if (appState.simTime >= PHYSICS_CONSTANTS.durationSim) {
+                appState.simTime = PHYSICS_CONSTANTS.durationSim;
+                appState.simStatus = 'finished';
+                appState.lastFrameTimestamp = null;
+                setStatusBanner('finished', 'Percobaan selesai. Amati hasil dan tekan "Catat Hasil ke Tabel".');
+                updateControlButtonsState();
+                updateNumericalSummary();
+                renderSimulationCanvas();
+                return;
+            }
+
+            updateNumericalSummary();
+            renderSimulationCanvas();
+            appState.animFrameId = requestAnimationFrame(animationStep);
+        }
+
+        function startSimulation() {
+            if (appState.simStatus === 'running') return;
+            if (appState.animFrameId) cancelAnimationFrame(appState.animFrameId);
+
+            appState.simTime = 0.0;
+            appState.simStatus = 'running';
+            appState.lastFrameTimestamp = null;
+            appState.currentRunRecorded = false;
+
+            setStatusBanner('running', 'Simulasi sedang berjalan...');
+            updateControlButtonsState();
+            updateNumericalSummary();
+            renderSimulationCanvas();
+            appState.animFrameId = requestAnimationFrame(animationStep);
+        }
+
+        function togglePauseSimulation() {
+            if (appState.simStatus === 'running') {
+                appState.simStatus = 'paused';
+                appState.lastFrameTimestamp = null;
+                if (appState.animFrameId) cancelAnimationFrame(appState.animFrameId);
+                setStatusBanner('paused', 'Simulasi dijeda.');
+                updateControlButtonsState();
+            } else if (appState.simStatus === 'paused') {
+                appState.simStatus = 'running';
+                appState.lastFrameTimestamp = null;
+                setStatusBanner('running', 'Simulasi sedang berjalan...');
+                updateControlButtonsState();
+                appState.animFrameId = requestAnimationFrame(animationStep);
+            }
+        }
+
+        function resetSimulation() {
+            if (appState.animFrameId) cancelAnimationFrame(appState.animFrameId);
+            appState.simTime = 0.0;
+            appState.simStatus = 'ready';
+            appState.lastFrameTimestamp = null;
+            appState.currentRunRecorded = false;
+
+            setStatusBanner('ready', 'Siap melakukan percobaan.');
+            updateControlButtonsState();
+            updateNumericalSummary();
+            renderSimulationCanvas();
+        }
+
+        function switchMode(modeNum) {
+            if (appState.simStatus === 'running' || appState.simStatus === 'paused') {
+                resetSimulation();
+            }
+            appState.currentMode = modeNum;
+
+            // Update Mode Cards UI
+            const card1 = document.getElementById('modeCard1');
+            const card2 = document.getElementById('modeCard2');
+            const btn1 = document.getElementById('btnSelectMode1');
+            const btn2 = document.getElementById('btnSelectMode2');
+
+            if (modeNum === 1) {
+                card1.classList.add('active');
+                card2.classList.remove('active');
+                btn1.className = 'btn btn-primary';
+                btn2.className = 'btn btn-outline';
+
+                document.getElementById('workspaceTitle').textContent = 'Area Eksperimen: Mode 1 — Uji Besar Gaya';
+                document.getElementById('workspaceGoal').textContent = 'Membandingkan pengaruh besar gaya terhadap perubahan gerak benda ketika arah gaya, massa, kecepatan awal, dan lama gaya bekerja tetap sama.';
+                document.getElementById('controlsMode1').classList.remove('hidden');
+                document.getElementById('controlsMode2').classList.add('hidden');
+                document.getElementById('sectionMode1Details').classList.remove('hidden');
+                document.getElementById('sectionMode2Details').classList.add('hidden');
+            } else {
+                card2.classList.add('active');
+                card1.classList.remove('active');
+                btn2.className = 'btn btn-primary';
+                btn1.className = 'btn btn-outline';
+
+                document.getElementById('workspaceTitle').textContent = 'Area Eksperimen: Mode 2 — Uji Arah Gaya';
+                document.getElementById('workspaceGoal').textContent = 'Menganalisis bagaimana perubahan arah gaya dapat mengubah kelajuan, arah gerak, atau lintasan benda.';
+                document.getElementById('controlsMode2').classList.remove('hidden');
+                document.getElementById('controlsMode1').classList.add('hidden');
+                document.getElementById('sectionMode2Details').classList.remove('hidden');
+                document.getElementById('sectionMode1Details').classList.add('hidden');
+            }
+
+            renderFixedVariables();
+            resetSimulation();
+        }
+
+        function selectForceMagnitude(forceVal) {
+            if (appState.simStatus === 'running' || appState.simStatus === 'paused') return;
+            appState.selectedForceMag = forceVal;
+
+            [2, 4, 6].forEach(val => {
+                const btn = document.getElementById('btnForce' + val);
+                if (val === forceVal) btn.classList.add('selected');
+                else btn.classList.remove('selected');
+            });
+
+            resetSimulation();
+        }
+
+        function selectForceDirection(angleVal) {
+            if (appState.simStatus === 'running' || appState.simStatus === 'paused') return;
+            appState.selectedForceAngle = angleVal;
+
+            [0, 90, 180].forEach(val => {
+                const btn = document.getElementById('btnDir' + val);
+                if (val === angleVal) btn.classList.add('selected');
+                else btn.classList.remove('selected');
+            });
+
+            resetSimulation();
+        }
+
+        function recordExperimentResult() {
+            if (appState.simStatus !== 'finished' || appState.currentRunRecorded) return;
+
+            const kin = calculateKinematicsAtTime(PHYSICS_CONSTANTS.durationSim);
+            const desc = getMotionDescriptions(kin);
+
+            if (appState.currentMode === 1) {
+                const duplicate = appState.recordsMode1.some(r => r.forceValue === kin.F);
+                if (duplicate) {
+                    appState.currentRunRecorded = true;
+                    updateControlButtonsState();
+                    setStatusBanner('finished', `Data untuk besar gaya ${kin.F} N sudah tercatat di Tabel Mode 1.`);
+                    return;
+                }
+
+                appState.recordsMode1.push({
+                    forceValue: kin.F,
+                    forceText: `${kin.F} N`,
+                    accelText: `${formatNumberID(kin.ax)} m/s²`,
+                    v0Text: '4 m/s',
+                    vFinalText: `${formatNumberID(kin.speed)} m/s`,
+                    changeText: `${desc.shortChange} (Perpindahan: ${formatNumberID(kin.sx)} m)`
+                });
+                renderTableMode1();
+            } else {
+                const duplicate = appState.recordsMode2.some(r => r.angleValue === kin.angleDeg);
+                if (duplicate) {
+                    appState.currentRunRecorded = true;
+                    updateControlButtonsState();
+                    setStatusBanner('finished', `Data untuk arah gaya ${kin.angleDeg}° sudah tercatat di Tabel Mode 2.`);
+                    return;
+                }
+
+                appState.recordsMode2.push({
+                    angleValue: kin.angleDeg,
+                    dirText: desc.forceDirLabel,
+                    v0Text: '4 m/s',
+                    vFinalText: `${formatNumberID(kin.speed)} m/s`,
+                    finalDirText: desc.finalDirLabel,
+                    changeText: desc.shortChange
+                });
+                renderTableMode2();
+            }
+
+            appState.currentRunRecorded = true;
+            updateControlButtonsState();
+            setStatusBanner('finished', 'Hasil berhasil dicatat.');
+        }
+
+        function renderTableMode1() {
+            const tbody = document.getElementById('tbodyMode1');
+            if (appState.recordsMode1.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-table-msg">
+                            Belum ada data tercatat. Jalankan percobaan Mode 1 lalu tekan tombol “Catat Hasil ke Tabel”.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = appState.recordsMode1.map((row, idx) => `
+                <tr>
+                    <td><strong>${idx + 1}</strong></td>
+                    <td>${row.forceText}</td>
+                    <td>${row.accelText}</td>
+                    <td>${row.v0Text}</td>
+                    <td><strong>${row.vFinalText}</strong></td>
+                    <td>${row.changeText}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderTableMode2() {
+            const tbody = document.getElementById('tbodyMode2');
+            if (appState.recordsMode2.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-table-msg">
+                            Belum ada data tercatat. Jalankan percobaan Mode 2 lalu tekan tombol “Catat Hasil ke Tabel”.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = appState.recordsMode2.map((row, idx) => `
+                <tr>
+                    <td><strong>${idx + 1}</strong></td>
+                    <td>${row.dirText}</td>
+                    <td>${row.v0Text}</td>
+                    <td><strong>${row.vFinalText}</strong></td>
+                    <td>${row.finalDirText}</td>
+                    <td>${row.changeText}</td>
+                </tr>
+            `).join('');
+        }
+
+        function requestClearData(modeNum) {
+            document.getElementById('confirmBoxMode' + modeNum).classList.add('show');
+        }
+
+        function cancelClearData(modeNum) {
+            document.getElementById('confirmBoxMode' + modeNum).classList.remove('show');
+        }
+
+        function confirmClearData(modeNum) {
+            if (modeNum === 1) {
+                appState.recordsMode1 = [];
+                renderTableMode1();
+            } else {
+                appState.recordsMode2 = [];
+                renderTableMode2();
+            }
+            appState.currentRunRecorded = false;
+            updateControlButtonsState();
+            document.getElementById('confirmBoxMode' + modeNum).classList.remove('show');
+            setStatusBanner('ready', `Semua data pada Tabel Mode ${modeNum} telah dihapus.`);
+        }
+
+        function escapeCSV(text) {
+            const cleaned = String(text || '').replace(/"/g, '""');
+            return `"${cleaned}"`;
+        }
+
+        function exportTableCSV(modeNum) {
+            let csvRows = [];
+            if (modeNum === 1) {
+                csvRows.push(['TABEL HASIL PERCOBAAN MODE 1 - UJI BESAR GAYA'].map(escapeCSV).join(';'));
+                csvRows.push(['Nomor Percobaan', 'Besar Gaya', 'Percepatan', 'Kelajuan Awal', 'Kelajuan Akhir', 'Perubahan Gerak'].map(escapeCSV).join(';'));
+                appState.recordsMode1.forEach((r, i) => {
+                    csvRows.push([i + 1, r.forceText, r.accelText, r.v0Text, r.vFinalText, r.changeText].map(escapeCSV).join(';'));
+                });
+                csvRows.push('');
+                csvRows.push(['JAWABAN ANALISIS MODE 1'].map(escapeCSV).join(';'));
+                csvRows.push(['Pertanyaan 1', document.getElementById('ansM1Q1').value].map(escapeCSV).join(';'));
+                csvRows.push(['Pertanyaan 2', document.getElementById('ansM1Q2').value].map(escapeCSV).join(';'));
+                csvRows.push(['Pertanyaan 3', document.getElementById('ansM1Q3').value].map(escapeCSV).join(';'));
+            } else {
+                csvRows.push(['TABEL HASIL PERCOBAAN MODE 2 - UJI ARAH GAYA'].map(escapeCSV).join(';'));
+                csvRows.push(['Nomor Percobaan', 'Arah Gaya', 'Kelajuan Awal', 'Kelajuan Akhir', 'Arah Gerak Akhir', 'Perubahan Gerak yang Diamati'].map(escapeCSV).join(';'));
+                appState.recordsMode2.forEach((r, i) => {
+                    csvRows.push([i + 1, r.dirText, r.v0Text, r.vFinalText, r.finalDirText, r.changeText].map(escapeCSV).join(';'));
+                });
+                csvRows.push('');
+                csvRows.push(['JAWABAN ANALISIS MODE 2'].map(escapeCSV).join(';'));
+                csvRows.push(['Pertanyaan 1', document.getElementById('ansM2Q1').value].map(escapeCSV).join(';'));
+                csvRows.push(['Pertanyaan 2', document.getElementById('ansM2Q2').value].map(escapeCSV).join(';'));
+                csvRows.push(['Pertanyaan 3', document.getElementById('ansM2Q3').value].map(escapeCSV).join(';'));
+                csvRows.push(['Pertanyaan 4', document.getElementById('ansM2Q4').value].map(escapeCSV).join(';'));
+            }
+
+            csvRows.push('');
+            csvRows.push(['KESIMPULAN DETEKTIF GAYA'].map(escapeCSV).join(';'));
+            csvRows.push(['Kesimpulan 1 (Besar Gaya)', document.getElementById('conclusion1').value].map(escapeCSV).join(';'));
+            csvRows.push(['Kesimpulan 2 (Arah Gaya)', document.getElementById('conclusion2').value].map(escapeCSV).join(';'));
+
+            const csvString = '\uFEFF' + csvRows.join('\r\n');
+            const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Hasil_Detektif_Gaya_Mode_${modeNum}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        window.onload = function () {
+            resizeCanvas();
+            renderFixedVariables();
+            updateControlButtonsState();
+            updateNumericalSummary();
+            renderSimulationCanvas();
+        };
+
+        // Re-render canvas on window resize (orientation change, etc.)
+        let resizeTimeout;
+        window.addEventListener('resize', function () {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(function () {
+                renderSimulationCanvas();
+            }, 100);
+        });
+    </script>
+</body>
+</html>

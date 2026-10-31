@@ -1,0 +1,8 @@
+# Abaikan video mentah berukuran besar (>100 MB) di folder dokumentasi karena sudah di-embed via Google Drive
+dokumentasi/Video Siklus 1/
+dokumentasi/Video Siklus 2/
+dokumentasi/Video Siklus 3/
+dokumentasi/Video Siklus 4/
+dokumentasi/Pertemuan_1/VID_20260806_075619.mp4
+.DS_Store
+Thumbs.db

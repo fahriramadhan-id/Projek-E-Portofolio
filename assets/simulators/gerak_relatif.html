@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerak Relatif - IPA Kelas VII</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .app-container { max-width: 1024px; margin: 0 auto; height: 100vh; display: flex; flex-direction: column; background-color: white; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); overflow: hidden; }
+        
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        
+        @keyframes drive { from { transform: translateX(0); } to { transform: translateX(500px); } }
+        @keyframes driveMobile { from { transform: translateX(0); } to { transform: translateX(200px); } }
+        
+        .anim-drive { animation: drive 4s linear forwards; }
+        @media (max-width: 640px) { .anim-drive { animation: driveMobile 4s linear forwards; } }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Scene Elements */
+        .scene-sky { background: linear-gradient(to bottom, #87CEEB, #E0F6FF); }
+        .scene-road { background: #475569; position: relative; border-top: 4px solid #cbd5e1; border-bottom: 4px solid #cbd5e1; }
+        .road-line { position: absolute; top: 50%; transform: translateY(-50%); width: 100%; height: 4px; background: repeating-linear-gradient(90deg, transparent, transparent 20px, white 20px, white 40px); }
+    </style>
+</head>
+<body>
+
+    <div class="app-container" id="app">
+        <!-- Content will be injected here by JavaScript -->
+    </div>
+
+    <script>
+        // Global Application State
+        const state = {
+            step: 1,
+            maxSteps: 6,
+            showHelp: false,
+            
+            // Step 2: Eksplorasi
+            expSelectedBenda: '',
+            expSelectedAcuan: '',
+            expIsSimulating: false,
+            expSimulationDone: false,
+            expAnswer1: null, // 'ya' or 'tidak'
+            expAnswer2: null, // 'bergerak' or 'diam'
+            
+            // Step 3: Buktikan
+            proveCurrentScenario: 0,
+            provePhase: 'observe', // observe, question, feedback
+            proveAnswerSelected: null,
+            
+            // Step 4: Pecahkan Masalah
+            probCurrentCase: 0,
+            probShowExplanation: false,
+            
+            // Step 5: Tantangan
+            quizCurrentQuestion: 0,
+            quizScore: 0,
+            quizAnswered: false,
+            quizSelectedOption: null,
+            
+            // Step 6: Kesimpulan
+            conclRevealed: 0
+        };
+
+        // DOM Elements
+        const app = document.getElementById('app');
+
+        function updateUI() {
+            app.innerHTML = `
+                ${renderHeader()}
+                <div class="flex-1 overflow-y-auto relative">
+                    ${renderHelpModal()}
+                    <div class="h-full p-4 md:p-8">
+                        ${renderCurrentStep()}
+                    </div>
+                </div>
+            `;
+            attachEventListeners();
+        }
+
+        function setStep(newStep) {
+            state.step = newStep;
+            updateUI();
+        }
+
+        function toggleHelp() {
+            state.showHelp = !state.showHelp;
+            updateUI();
+        }
+
+        function renderHeader() {
+            const stepNames = ["Beranda", "Eksplorasi", "Buktikan", "Pecahkan Masalah", "Tantangan", "Kesimpulan"];
+            const progressPercentage = ((state.step) / state.maxSteps) * 100;
+            
+            return `
+                <header class="bg-white border-b border-slate-200 sticky top-0 z-10">
+                    <div class="px-4 py-3 flex justify-between items-center bg-blue-600 text-white">
+                        <div class="font-bold text-lg tracking-wide flex items-center gap-2">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            GERAK RELATIF
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm font-medium bg-blue-700 px-3 py-1 rounded-full">Langkah ${state.step}/${state.maxSteps}</span>
+                            <button onclick="toggleHelp()" class="p-1 hover:bg-blue-500 rounded-full transition-colors" title="Petunjuk">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="h-1.5 w-full bg-slate-200">
+                        <div class="h-full bg-orange-500 transition-all duration-500 ease-out" style="width: ${progressPercentage}%"></div>
+                    </div>
+                </header>
+            `;
+        }
+
+        function renderHelpModal() {
+            if (!state.showHelp) return '';
+            let helpText = "";
+            switch(state.step) {
+                case 1: helpText = "Amati posisi benda, tentukan titik acuannya, lalu perhatikan apakah posisi benda berubah terhadap titik acuan tersebut."; break;
+                case 2: helpText = "Pilih benda yang ingin diamati dan titik acuannya. Jalankan simulasi, lalu lihat apakah jarak atau posisi benda berubah terhadap titik acuan."; break;
+                case 3: helpText = "Bandingkan posisi benda pada gambar AWAL dan AKHIR. Jika posisinya berubah, berarti bergerak. Jika posisinya tetap, berarti diam."; break;
+                case 4: helpText = "Baca cerita dengan saksama. Bayangkan kamu berada di posisi Rina atau pengamat lainnya."; break;
+                case 5: helpText = "Jawab pertanyaan berdasarkan pemahamanmu. Ingat: keadaan gerak tergantung pada titik acuan!"; break;
+                case 6: helpText = "Lengkapi kesimpulan berdasarkan apa yang telah kamu pelajari di langkah-langkah sebelumnya."; break;
+            }
+
+            return `
+                <div class="absolute inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4 fade-in">
+                    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl relative">
+                        <button onclick="toggleHelp()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                        <h3 class="text-xl font-bold text-blue-700 mb-3 flex items-center gap-2">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Petunjuk
+                        </h3>
+                        <p class="text-slate-600 text-lg leading-relaxed">${helpText}</p>
+                        <button onclick="toggleHelp()" class="mt-6 w-full bg-blue-100 text-blue-700 font-semibold py-2 rounded-xl hover:bg-blue-200 transition">Mengerti</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCurrentStep() {
+            switch(state.step) {
+                case 1: return renderBeranda();
+                case 2: return renderEksplorasi();
+                case 3: return renderBuktikan();
+                case 4: return renderPecahkanMasalah();
+                case 5: return renderTantangan();
+                case 6: return renderKesimpulan();
+                default: return renderBeranda();
+            }
+        }
+
+        function renderBeranda() {
+            return `
+                <div class="flex flex-col items-center justify-center h-full text-center fade-in max-w-3xl mx-auto">
+                    <div class="inline-block bg-orange-100 text-orange-700 px-4 py-1.5 rounded-full font-bold text-sm mb-6 tracking-widest uppercase">
+                        IPA Kelas VII
+                    </div>
+                    <h1 class="text-4xl md:text-6xl font-extrabold text-slate-800 mb-4 tracking-tight">
+                        GERAK <span class="text-blue-600">RELATIF</span>
+                    </h1>
+                    <h2 class="text-2xl md:text-3xl font-medium text-slate-500 mb-8 italic">
+                        “Bergerak atau Diam?”
+                    </h2>
+                    
+                    <div class="bg-blue-50 border border-blue-100 p-6 rounded-2xl mb-10 w-full shadow-sm">
+                        <p class="text-lg md:text-xl text-blue-900 font-medium">
+                            Tujuan Pembelajaran:<br>
+                            <span class="font-normal text-blue-800">Cari tahu bagaimana titik acuan menentukan apakah suatu benda bergerak atau diam.</span>
+                        </p>
+                    </div>
+
+                    <!-- Simple Illustration using HTML/CSS -->
+                    <div class="relative w-full h-48 md:h-64 rounded-2xl overflow-hidden mb-10 shadow-inner flex flex-col">
+                        <div class="scene-sky flex-1 relative flex items-end">
+                            <!-- Background Elements -->
+                            <div class="absolute right-10 bottom-2 text-6xl" title="Sekolah">🏫</div>
+                            <div class="absolute left-1/4 bottom-0 text-5xl" title="Pohon">🌳</div>
+                            <div class="absolute right-1/4 bottom-0 text-5xl" title="Pohon">🌲</div>
+                        </div>
+                        <div class="scene-road h-1/3 w-full">
+                            <div class="road-line"></div>
+                            <!-- Bus -->
+                            <div class="absolute bottom-2 left-10 text-6xl drop-shadow-md z-10 anim-drive">
+                                🚌
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-4 w-full justify-center">
+                        <button onclick="setStep(2)" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-xl text-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">
+                            MULAI EKSPLORASI
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function resetExploration() {
+            state.expIsSimulating = false;
+            state.expSimulationDone = false;
+            state.expAnswer1 = null;
+            state.expAnswer2 = null;
+            updateUI();
+        }
+
+        function runSimulation() {
+            if(!state.expSelectedBenda || !state.expSelectedAcuan) {
+                alert("Pilih benda dan titik acuan terlebih dahulu!");
+                return;
+            }
+            state.expIsSimulating = true;
+            updateUI();
+            
+            // Wait for animation to finish
+            setTimeout(() => {
+                state.expIsSimulating = false;
+                state.expSimulationDone = true;
+                updateUI();
+            }, 4000);
+        }
+
+        function handleExpAnswer(questionNum, answer) {
+            if (questionNum === 1) state.expAnswer1 = answer;
+            if (questionNum === 2) state.expAnswer2 = answer;
+            updateUI();
+        }
+
+        function renderEksplorasi() {
+            // Determine correct answers based on selection
+            let isMoving = false;
+            const benda = state.expSelectedBenda;
+            const acuan = state.expSelectedAcuan;
+            
+            if (benda === 'penumpang') {
+                if (acuan === 'kursibus' || acuan === 'bus') isMoving = false;
+                else isMoving = true;
+            } else if (benda === 'bus') {
+                if (acuan === 'kursibus' || acuan === 'penumpang') isMoving = false;
+                else isMoving = true;
+            } else if (benda === 'mobil') {
+                // Mobil diam, bus lewat
+                isMoving = true; // Relative to bus/passenger it moves, relative to tree it's stationary.
+                // Let's simplify and assume all static objects are stationary relative to each other.
+                if(acuan === 'pohon' || acuan === 'sekolah' || acuan === 'tiang') isMoving = false;
+                else isMoving = true;
+            }
+
+            const expectedAns1 = isMoving ? 'ya' : 'tidak';
+            const expectedAns2 = isMoving ? 'bergerak' : 'diam';
+
+            return `
+                <div class="flex flex-col h-full fade-in">
+                    <div class="flex justify-between items-end mb-2">
+                        <h2 class="text-3xl font-bold text-slate-800">Mode Eksplorasi</h2>
+                    </div>
+                    
+                    <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-xl mb-6 shadow-sm flex items-start gap-4">
+                        <div class="bg-indigo-100 p-2 rounded-full text-indigo-600 shrink-0">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-indigo-900 font-bold mb-1">Misi Pengamatan:</h3>
+                            <p class="text-indigo-800 text-sm md:text-base leading-relaxed">
+                                Pilih benda dan titik acuan di bawah. Perhatikan label <b>[👁️ Benda]</b> dan <b>[📍 Acuan]</b> yang muncul di layar. <br>
+                                <b>Tugasmu:</b> Amati apakah <b>jarak atau posisi</b> di antara kedua label tersebut <b>berubah</b> saat bus melaju!
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Scene -->
+                    <div class="relative w-full h-56 md:h-72 rounded-2xl overflow-hidden shadow-md border-2 border-slate-300 flex flex-col mb-6 bg-white">
+                        <div class="scene-sky flex-1 relative flex items-end pb-2">
+                            <div class="absolute right-[5%] bottom-2 text-6xl relative">
+                                🏫
+                                ${state.expSelectedAcuan === 'sekolah' ? '<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md animate-bounce z-20 whitespace-nowrap font-sans tracking-normal">📍 Acuan</div>' : ''}
+                            </div>
+                            <div class="absolute left-[30%] bottom-0 text-5xl relative">
+                                🌳
+                                ${state.expSelectedAcuan === 'pohon' ? '<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md animate-bounce z-20 whitespace-nowrap font-sans tracking-normal">📍 Acuan</div>' : ''}
+                            </div>
+                            <div class="absolute right-[40%] bottom-0 text-4xl opacity-80">🌲</div>
+                            
+                            <div class="absolute right-[20%] bottom-0 text-5xl relative" style="transform: scaleX(-1);">
+                                🚗
+                                <div style="transform: scaleX(-1);" class="absolute inset-0 pointer-events-none">
+                                    ${state.expSelectedBenda === 'mobil' ? '<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md animate-bounce z-20 whitespace-nowrap font-sans tracking-normal">👁️ Benda</div>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="scene-road h-24 w-full relative">
+                            <div class="road-line"></div>
+                            
+                            <!-- Bus Group -->
+                            <div class="absolute bottom-3 left-4 text-7xl drop-shadow-xl z-10 transition-transform duration-[4000ms] ease-linear ${state.expIsSimulating || state.expSimulationDone ? 'translate-x-[60vw] md:translate-x-[40vw]' : 'translate-x-0'}">
+                                🚌
+                                ${state.expSelectedBenda === 'bus' ? '<div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md animate-bounce z-20 whitespace-nowrap font-sans tracking-normal text-base">👁️ Benda</div>' : ''}
+                                ${state.expSelectedAcuan === 'kursibus' ? '<div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md animate-bounce z-20 whitespace-nowrap font-sans tracking-normal text-base">📍 Acuan</div>' : ''}
+                                
+                                <div class="absolute top-2 left-6 text-2xl" title="Penumpang">
+                                    🧑
+                                    ${state.expSelectedBenda === 'penumpang' ? '<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md animate-bounce z-20 whitespace-nowrap font-sans tracking-normal text-base">👁️ Benda</div>' : ''}
+                                </div>
+                            </div>
+
+                            ${state.expIsSimulating ? `
+                                <div class="absolute top-2 left-1/2 -translate-x-1/2 bg-slate-800/80 text-white text-sm font-bold px-4 py-1.5 rounded-full z-30 animate-pulse">
+                                    Merekam Pergerakan...
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 flex flex-col md:flex-row gap-4">
+                        <div class="flex-1">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">Benda yang diamati:</label>
+                            <select id="sel-benda" class="w-full border-slate-300 rounded-lg p-2.5 bg-slate-50 focus:ring-blue-500 focus:border-blue-500 text-lg" onchange="state.expSelectedBenda = this.value; resetExploration();">
+                                <option value="" disabled ${!state.expSelectedBenda ? 'selected' : ''}>-- Pilih Benda --</option>
+                                <option value="penumpang" ${state.expSelectedBenda === 'penumpang' ? 'selected' : ''}>🧑 Penumpang</option>
+                                <option value="bus" ${state.expSelectedBenda === 'bus' ? 'selected' : ''}>🚌 Bus</option>
+                                <option value="mobil" ${state.expSelectedBenda === 'mobil' ? 'selected' : ''}>🚗 Mobil Parkir</option>
+                            </select>
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">Titik acuan:</label>
+                            <select id="sel-acuan" class="w-full border-slate-300 rounded-lg p-2.5 bg-slate-50 focus:ring-blue-500 focus:border-blue-500 text-lg" onchange="state.expSelectedAcuan = this.value; resetExploration();">
+                                <option value="" disabled ${!state.expSelectedAcuan ? 'selected' : ''}>-- Pilih Titik Acuan --</option>
+                                <option value="kursibus" ${state.expSelectedAcuan === 'kursibus' ? 'selected' : ''}>💺 Kursi Bus</option>
+                                <option value="pohon" ${state.expSelectedAcuan === 'pohon' ? 'selected' : ''}>🌳 Pohon</option>
+                                <option value="sekolah" ${state.expSelectedAcuan === 'sekolah' ? 'selected' : ''}>🏫 Gedung Sekolah</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="runSimulation()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition-colors flex items-center justify-center gap-2" ${state.expIsSimulating || !state.expSelectedBenda || !state.expSelectedAcuan ? 'disabled opacity-50 cursor-not-allowed' : ''}>
+                                ${state.expIsSimulating ? '<svg class="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Menjalankan...' : '▶ Jalankan Simulasi'}
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Questions & Feedback -->
+                    ${state.expSimulationDone ? `
+                        <div class="bg-blue-50 p-6 rounded-xl border border-blue-100 fade-in flex-1 flex flex-col">
+                            <div class="mb-6">
+                                <p class="text-xl font-medium text-slate-800 mb-3">1. Apakah jarak atau posisi antara <b>${getLabel(state.expSelectedBenda)}</b> dan <b>${getLabel(state.expSelectedAcuan)}</b> berubah?</p>
+                                <div class="flex gap-3">
+                                    <button onclick="handleExpAnswer(1, 'ya')" class="flex-1 py-3 rounded-lg border-2 font-bold text-lg transition ${state.expAnswer1 === 'ya' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-700 border-slate-300 hover:border-blue-400'}">YA, BERUBAH</button>
+                                    <button onclick="handleExpAnswer(1, 'tidak')" class="flex-1 py-3 rounded-lg border-2 font-bold text-lg transition ${state.expAnswer1 === 'tidak' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-700 border-slate-300 hover:border-blue-400'}">TIDAK BERUBAH</button>
+                                </div>
+                                ${state.expAnswer1 && state.expAnswer1 !== expectedAns1 ? `
+                                    <p class="text-red-600 mt-2 font-medium flex items-center gap-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Coba jalankan ulang simulasi dan perhatikan label [👁️ Benda] dan [📍 Acuan].</p>
+                                ` : ''}
+                            </div>
+
+                            ${state.expAnswer1 === expectedAns1 ? `
+                                <div class="mb-6 fade-in">
+                                    <p class="text-xl font-medium text-slate-800 mb-3">2. Jika ditinjau dari titik acuan tersebut, maka <b>${getLabel(state.expSelectedBenda)}</b> dikatakan ...</p>
+                                    <div class="flex gap-3">
+                                        <button onclick="handleExpAnswer(2, 'bergerak')" class="flex-1 py-3 rounded-lg border-2 font-bold text-lg transition ${state.expAnswer2 === 'bergerak' ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-slate-700 border-slate-300 hover:border-orange-400'}">BERGERAK</button>
+                                        <button onclick="handleExpAnswer(2, 'diam')" class="flex-1 py-3 rounded-lg border-2 font-bold text-lg transition ${state.expAnswer2 === 'diam' ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-slate-700 border-slate-300 hover:border-orange-400'}">DIAM</button>
+                                    </div>
+                                    ${state.expAnswer2 && state.expAnswer2 !== expectedAns2 ? `
+                                        <p class="text-red-600 mt-2 font-medium flex items-center gap-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Ingat aturan dasarnya: Posisi berubah = Bergerak. Posisi tetap = Diam.</p>
+                                    ` : ''}
+                                </div>
+                            ` : ''}
+
+                            ${state.expAnswer1 === expectedAns1 && state.expAnswer2 === expectedAns2 ? `
+                                <div class="mt-auto bg-green-100 border border-green-300 p-4 rounded-xl fade-in flex items-start gap-3">
+                                    <div class="bg-green-500 text-white rounded-full p-1 mt-0.5"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></div>
+                                    <div>
+                                        <p class="text-green-800 font-bold mb-1">Benar Sekali!</p>
+                                        <p class="text-green-700 text-sm">Posisi label [👁️ Benda] <b>${isMoving ? 'terlihat terus berubah/menjauh' : 'tetap sejajar/tidak berubah'}</b> terhadap label [📍 Acuan]. Karena itu, ${getLabel(state.expSelectedBenda)} dinyatakan <b>${isMoving ? 'bergerak' : 'diam'}</b> terhadap ${getLabel(state.expSelectedAcuan)}.</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4 flex flex-col sm:flex-row gap-3">
+                                    <button onclick="resetExploration()" class="flex-1 bg-white border-2 border-slate-300 hover:border-blue-400 hover:text-blue-600 text-slate-700 font-bold py-3 rounded-xl transition shadow-sm">COBA SKENARIO LAIN</button>
+                                    <button onclick="setStep(3)" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition">LANJUT: BUKTIKAN ➔</button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    ` : `
+                        <div class="flex-1 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center text-slate-500 bg-slate-50 p-6 text-center">
+                            <svg class="w-12 h-12 text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            <p class="font-medium text-lg mb-1">Siap mengamati?</p>
+                            <p class="text-sm">Pilih <b>Benda</b> dan <b>Titik Acuan</b> di atas, lalu tekan <b>Jalankan Simulasi</b> untuk melihat perubahan posisinya.</p>
+                        </div>
+                    `}
+                </div>
+            `;
+        }
+        
+        function getLabel(key) {
+            const labels = { 'penumpang':'Penumpang', 'bus':'Bus', 'mobil':'Mobil', 'kursibus':'Kursi Bus', 'pohon':'Pohon', 'sekolah':'Sekolah', 'tiang':'Tiang' };
+            return labels[key] || key;
+        }
+
+        const proveScenarios = [
+            { 
+                benda: "Penumpang", acuan: "Kursi Bus", imgStart: "🧑💺 (Dekat)", imgEnd: "🧑💺 (Tetap Dekat)", 
+                change: false, ans: "diam", 
+                reason: "Benda dikatakan diam jika posisinya tetap terhadap titik acuan."
+            },
+            { 
+                benda: "Penumpang", acuan: "Pohon", imgStart: "🚌.....🌳 (Jauh)", imgEnd: "🌳.....🚌 (Melewati)", 
+                change: true, ans: "bergerak",
+                reason: "Benda dikatakan bergerak jika posisinya berubah terhadap titik acuan."
+            },
+            { 
+                benda: "Bola", acuan: "Tiang Gawang", imgStart: "⚽.....🥅 (Tengah lapangan)", imgEnd: "🥅⚽ (Masuk gawang)", 
+                change: true, ans: "bergerak",
+                reason: "Benda dikatakan bergerak jika posisinya berubah terhadap titik acuan."
+            },
+            { 
+                benda: "Sepeda Parkir", acuan: "Gedung Sekolah", imgStart: "🚲🏫 (Di depan sekolah)", imgEnd: "🚲🏫 (Tetap di depan sekolah)", 
+                change: false, ans: "diam",
+                reason: "Benda dikatakan diam jika posisinya tetap terhadap titik acuan."
+            }
+        ];
+
+        function checkProveAnswer(answer) {
+            state.proveAnswerSelected = answer;
+            state.provePhase = 'feedback';
+            updateUI();
+        }
+
+        function nextProveScenario() {
+            if (state.proveCurrentScenario < proveScenarios.length - 1) {
+                state.proveCurrentScenario++;
+                state.provePhase = 'observe';
+                state.proveAnswerSelected = null;
+                updateUI();
+            } else {
+                setStep(4);
+            }
+        }
+
+        function renderBuktikan() {
+            const s = proveScenarios[state.proveCurrentScenario];
+            const isCorrect = state.proveAnswerSelected === s.ans;
+
+            return `
+                <div class="flex flex-col h-full fade-in max-w-4xl mx-auto">
+                    <div class="flex justify-between items-end mb-4">
+                        <h2 class="text-3xl font-bold text-slate-800">Mode "Buktikan"</h2>
+                        <span class="text-sm font-semibold text-slate-500 bg-slate-200 px-3 py-1 rounded-full">Kasus ${state.proveCurrentScenario + 1} dari 4</span>
+                    </div>
+                    <p class="text-slate-600 mb-6">Amati posisi awal dan akhir. Gunakan bukti visual untuk menentukan keadaan benda.</p>
+
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-slate-100 rounded-xl p-4 text-center border-2 border-slate-200 shadow-sm flex flex-col items-center justify-center min-h-[150px]">
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">POSISI AWAL</p>
+                            <div class="text-4xl my-auto">${s.imgStart}</div>
+                        </div>
+                        <div class="bg-slate-100 rounded-xl p-4 text-center border-2 border-slate-200 shadow-sm flex flex-col items-center justify-center min-h-[150px]">
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">POSISI AKHIR</p>
+                            <div class="text-4xl my-auto">${s.imgEnd}</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-blue-100 shadow-md rounded-2xl p-6 flex-1 flex flex-col">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-center">
+                            <div class="bg-blue-50 p-3 rounded-lg">
+                                <span class="block text-xs text-blue-600 font-bold uppercase mb-1">Benda Diamati</span>
+                                <span class="text-lg font-semibold">${s.benda}</span>
+                            </div>
+                            <div class="bg-blue-50 p-3 rounded-lg">
+                                <span class="block text-xs text-blue-600 font-bold uppercase mb-1">Titik Acuan</span>
+                                <span class="text-lg font-semibold">${s.acuan}</span>
+                            </div>
+                            <div class="bg-blue-50 p-3 rounded-lg">
+                                <span class="block text-xs text-blue-600 font-bold uppercase mb-1">Posisi Berubah?</span>
+                                <span class="text-lg font-semibold">${s.change ? 'YA' : 'TIDAK'}</span>
+                            </div>
+                        </div>
+
+                        <div class="text-center mb-6">
+                            <p class="text-xl font-medium mb-4">Berdasarkan bukti di atas, benda tersebut...</p>
+                            <div class="flex justify-center gap-4">
+                                <button onclick="checkProveAnswer('bergerak')" class="w-40 py-3 rounded-xl border-2 font-bold text-lg transition ${state.proveAnswerSelected === 'bergerak' ? (s.ans === 'bergerak' ? 'bg-green-500 text-white border-green-500' : 'bg-red-500 text-white border-red-500') : 'bg-white text-slate-700 hover:border-orange-500 hover:text-orange-500 border-slate-300'}" ${state.provePhase === 'feedback' ? 'disabled' : ''}>BERGERAK</button>
+                                
+                                <button onclick="checkProveAnswer('diam')" class="w-40 py-3 rounded-xl border-2 font-bold text-lg transition ${state.proveAnswerSelected === 'diam' ? (s.ans === 'diam' ? 'bg-green-500 text-white border-green-500' : 'bg-red-500 text-white border-red-500') : 'bg-white text-slate-700 hover:border-orange-500 hover:text-orange-500 border-slate-300'}" ${state.provePhase === 'feedback' ? 'disabled' : ''}>DIAM</button>
+                            </div>
+                        </div>
+
+                        ${state.provePhase === 'feedback' ? `
+                            <div class="mt-auto p-4 rounded-xl fade-in ${isCorrect ? 'bg-green-100 border border-green-300 text-green-800' : 'bg-red-100 border border-red-300 text-red-800'}">
+                                <p class="font-bold mb-1">${isCorrect ? 'Tepat Sekali!' : 'Kurang Tepat.'}</p>
+                                <p>${s.reason}</p>
+                            </div>
+                            <button onclick="nextProveScenario()" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-md transition-colors text-lg">
+                                ${state.proveCurrentScenario < proveScenarios.length - 1 ? 'LANJUT KE SKENARIO BERIKUTNYA' : 'LANJUT: PECAHKAN MASALAH ➔'}
+                            </button>
+                        ` : '<div class="mt-auto h-24"></div>'}
+                    </div>
+                </div>
+            `;
+        }
+
+        const problemCases = [
+            {
+                story: "Rina duduk di dalam bus yang melaju menuju sekolah. Budi berdiri di dalam bus berpegangan pada tiang. Pak Guru berdiri di trotoar pinggir jalan melihat bus lewat.",
+                q1: "Apakah Rina bergerak terhadap kursi bus yang didudukinya?",
+                q2: "Apakah Rina bergerak terhadap pohon di pinggir jalan?",
+                q3: "Mengapa jawabanmu untuk Rina bisa berbeda meskipun orangnya sama?",
+                explanation: "Keadaan gerak sangat bergantung pada <b>titik acuan</b>. Rina dikatakan <b>diam</b> terhadap kursi karena jarak dan posisinya tetap. Namun, Rina dikatakan <b>bergerak</b> terhadap pohon karena posisinya terus berubah seiring bus melaju."
+            },
+            {
+                story: "Bola ditendang oleh kapten tim dari tengah lapangan menuju gawang. Kiper bersiap menangkap di depan garis gawang.",
+                q1: "Terhadap kapten tim, apakah bola bergerak?",
+                q2: "Terhadap rumput yang menempel pada bola, apakah bola bergerak?",
+                q3: "Mengapa benda yang sama bisa punya status gerak yang berbeda?",
+                explanation: "Karena titik acuannya berbeda. Terhadap kapten, posisi bola menjauh (berubah) sehingga bola <b>bergerak</b>. Namun, terhadap kotoran/rumput yang menempel di bola, posisinya tidak berubah sama sekali, sehingga <b>diam</b>."
+            },
+            {
+                story: "Andi berjalan mondar-mandir di depan papan tulis kelas sambil membaca buku. Siswa lain duduk memperhatikan Andi.",
+                q1: "Apakah Andi bergerak terhadap papan tulis?",
+                q2: "Apakah buku yang dipegang Andi bergerak terhadap mata Andi?",
+                q3: "Jelaskan alasan dari kedua jawaban di atas!",
+                explanation: "Andi <b>bergerak</b> terhadap papan tulis karena posisinya terus berpindah (menjauh/mendekat). Buku <b>diam</b> terhadap mata Andi karena jarak buku ke mata Andi tetap sama (tidak berubah) saat dia berjalan."
+            }
+        ];
+
+        function showExplanation() {
+            state.probShowExplanation = true;
+            updateUI();
+        }
+
+        function nextProblemCase() {
+            if (state.probCurrentCase < problemCases.length - 1) {
+                state.probCurrentCase++;
+                state.probShowExplanation = false;
+                updateUI();
+            } else {
+                setStep(5);
+            }
+        }
+
+        function renderPecahkanMasalah() {
+            const p = problemCases[state.probCurrentCase];
+
+            return `
+                <div class="flex flex-col h-full fade-in max-w-4xl mx-auto">
+                    <div class="flex justify-between items-end mb-4">
+                        <h2 class="text-3xl font-bold text-slate-800">Mode "Pecahkan Masalah"</h2>
+                        <span class="text-sm font-semibold text-slate-500 bg-slate-200 px-3 py-1 rounded-full">Kasus ${state.probCurrentCase + 1} dari 3</span>
+                    </div>
+                    
+                    <div class="bg-amber-50 border-l-4 border-amber-500 p-5 rounded-r-xl mb-6 shadow-sm">
+                        <p class="text-lg text-slate-700 italic font-medium leading-relaxed">"${p.story}"</p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 shadow-md rounded-2xl p-6 flex-1 flex flex-col">
+                        <div class="space-y-5 mb-6">
+                            <div>
+                                <p class="font-semibold text-slate-800 mb-2">1. ${p.q1}</p>
+                                <input type="text" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="Ketik jawaban singkat...">
+                            </div>
+                            <div>
+                                <p class="font-semibold text-slate-800 mb-2">2. ${p.q2}</p>
+                                <input type="text" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="Ketik jawaban singkat...">
+                            </div>
+                            <div>
+                                <p class="font-semibold text-slate-800 mb-2">3. ${p.q3}</p>
+                                <textarea class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none transition resize-none h-24" placeholder="Berikan alasanmu..."></textarea>
+                            </div>
+                        </div>
+
+                        ${!state.probShowExplanation ? `
+                            <button onclick="showExplanation()" class="mt-auto w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition shadow text-lg">
+                                LIHAT PENJELASAN
+                            </button>
+                        ` : `
+                            <div class="mt-auto bg-green-50 border border-green-200 p-5 rounded-xl fade-in">
+                                <h4 class="font-bold text-green-800 mb-2 flex items-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    Penjelasan Pakar:
+                                </h4>
+                                <p class="text-slate-700 leading-relaxed">${p.explanation}</p>
+                            </div>
+                            <button onclick="nextProblemCase()" class="mt-4 w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3.5 rounded-xl transition shadow text-lg">
+                                ${state.probCurrentCase < problemCases.length - 1 ? 'COBA KASUS LAIN' : 'LANJUT: TANTANGAN ➔'}
+                            </button>
+                        `}
+                    </div>
+                </div>
+            `;
+        }
+
+        const quizQuestions = [
+            { q: "Sebuah bus bergerak melewati sekolah. Penumpang duduk di kursinya. Terhadap kursi bus, penumpang tersebut ...", a: "diam", feedback: "Posisi penumpang tidak berubah terhadap kursi." },
+            { q: "Sebuah kereta melaju kencang. Terhadap stasiun yang ditinggalkan, kereta tersebut ...", a: "bergerak", feedback: "Posisi kereta semakin jauh (berubah) meninggalkan stasiun." },
+            { q: "Burung terbang melewati pohon. Terhadap pohon, burung tersebut ...", a: "bergerak", feedback: "Posisi burung berpindah relatif terhadap pohon yang diam di tanah." },
+            { q: "Kamu sedang memegang ponsel sambil berjalan. Terhadap tanganmu, ponsel tersebut ...", a: "diam", feedback: "Jarak dan posisi ponsel terhadap tanganmu tetap sama, meskipun kamu berjalan." },
+            { q: "Bumi berputar mengelilingi matahari. Terhadap matahari, bumi ...", a: "bergerak", feedback: "Posisi bumi terus berubah menempuh lintasan mengelilingi matahari." },
+            { q: "Sopir taksi menyetir mobilnya di jalan tol. Terhadap setir mobil, sopir tersebut ...", a: "diam", feedback: "Posisi sopir terhadap setir di depannya tidak berubah." },
+            { q: "Mobil A dan Mobil B melaju berdampingan di jalan tol dengan arah dan kecepatan yang sama persis. Terhadap Mobil B, Mobil A ...", a: "diam", feedback: "Karena mereka sejajar terus, posisi Mobil A tidak berubah terhadap Mobil B." },
+            { q: "Penumpang naik eskalator dari lantai 1 ke lantai 2. Terhadap lantai 1, penumpang tersebut ...", a: "bergerak", feedback: "Posisi penumpang semakin menjauh dari lantai 1." },
+            { q: "Penumpang naik eskalator. Terhadap anak tangga eskalator tempat ia berpijak, penumpang ...", a: "diam", feedback: "Penumpang berdiri diam di atas anak tangga tersebut, posisinya tidak berubah terhadap anak tangga itu." },
+            { q: "Bola berpindah dari titik A menuju gawang. Jika tiang gawang digunakan sebagai titik acuan, bola ...", a: "bergerak", feedback: "Jarak bola ke gawang berubah (makin dekat)." }
+        ];
+
+        function handleQuizAnswer(answer) {
+            if (state.quizAnswered) return;
+            state.quizSelectedOption = answer;
+            state.quizAnswered = true;
+            if (answer === quizQuestions[state.quizCurrentQuestion].a) {
+                state.quizScore++;
+            }
+            updateUI();
+        }
+
+        function nextQuizQuestion() {
+            if (state.quizCurrentQuestion < quizQuestions.length - 1) {
+                state.quizCurrentQuestion++;
+                state.quizAnswered = false;
+                state.quizSelectedOption = null;
+                updateUI();
+            } else {
+                setStep(6);
+            }
+        }
+
+        function renderTantangan() {
+            if (state.quizCurrentQuestion >= quizQuestions.length) return ''; // Failsafe
+            
+            const q = quizQuestions[state.quizCurrentQuestion];
+            const isCorrect = state.quizSelectedOption === q.a;
+
+            return `
+                <div class="flex flex-col h-full fade-in max-w-3xl mx-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-3xl font-bold text-slate-800">Tantangan Cepat</h2>
+                        <div class="bg-blue-100 text-blue-800 font-bold px-4 py-2 rounded-lg">
+                            Soal ${state.quizCurrentQuestion + 1} / 10
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 shadow-lg rounded-2xl p-6 md:p-10 flex-1 flex flex-col justify-center">
+                        <p class="text-xl md:text-2xl text-slate-800 font-medium leading-relaxed mb-10 text-center">
+                            "${q.q}"
+                        </p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                            <button onclick="handleQuizAnswer('bergerak')" class="py-5 rounded-xl border-2 font-bold text-xl transition transform hover:-translate-y-1 ${state.quizAnswered ? (q.a === 'bergerak' ? 'bg-green-500 border-green-600 text-white' : (state.quizSelectedOption === 'bergerak' ? 'bg-red-500 border-red-600 text-white' : 'bg-slate-100 border-slate-200 text-slate-400')) : 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100'} shadow-sm" ${state.quizAnswered ? 'disabled' : ''}>
+                                A. Bergerak
+                            </button>
+                            <button onclick="handleQuizAnswer('diam')" class="py-5 rounded-xl border-2 font-bold text-xl transition transform hover:-translate-y-1 ${state.quizAnswered ? (q.a === 'diam' ? 'bg-green-500 border-green-600 text-white' : (state.quizSelectedOption === 'diam' ? 'bg-red-500 border-red-600 text-white' : 'bg-slate-100 border-slate-200 text-slate-400')) : 'bg-orange-50 border-orange-200 text-orange-700 hover:bg-orange-100'} shadow-sm" ${state.quizAnswered ? 'disabled' : ''}>
+                                B. Diam
+                            </button>
+                        </div>
+
+                        ${state.quizAnswered ? `
+                            <div class="mt-4 p-5 rounded-xl fade-in ${isCorrect ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}">
+                                <p class="font-bold text-lg mb-1 ${isCorrect ? 'text-green-700' : 'text-red-700'}">
+                                    ${isCorrect ? 'Jawaban Tepat!' : 'Belum Tepat.'}
+                                </p>
+                                <p class="text-slate-700">${q.feedback}</p>
+                            </div>
+                            <button onclick="nextQuizQuestion()" class="mt-8 w-full ${state.quizCurrentQuestion < 9 ? 'bg-blue-600 hover:bg-blue-700' : 'bg-green-600 hover:bg-green-700'} text-white font-bold py-4 rounded-xl shadow-md transition-colors text-lg">
+                                ${state.quizCurrentQuestion < 9 ? 'LANJUT KE SOAL BERIKUTNYA' : 'LIHAT HASIL AKHIR ➔'}
+                            </button>
+                        ` : '<div class="mt-4 h-32"></div>'}
+                    </div>
+                </div>
+            `;
+        }
+
+        function revealConclusion() {
+            if (state.conclRevealed < 4) {
+                state.conclRevealed++;
+                updateUI();
+            }
+        }
+
+        function restartApp() {
+            // Reset all state
+            state.step = 1;
+            state.expSelectedBenda = ''; state.expSelectedAcuan = ''; state.expIsSimulating = false; state.expSimulationDone = false; state.expAnswer1 = null; state.expAnswer2 = null;
+            state.proveCurrentScenario = 0; state.provePhase = 'observe'; state.proveAnswerSelected = null;
+            state.probCurrentCase = 0; state.probShowExplanation = false;
+            state.quizCurrentQuestion = 0; state.quizScore = 0; state.quizAnswered = false; state.quizSelectedOption = null;
+            state.conclRevealed = 0;
+            updateUI();
+        }
+
+        function renderKesimpulan() {
+            return `
+                <div class="flex flex-col h-full fade-in max-w-3xl mx-auto pb-10">
+                    <h2 class="text-4xl font-extrabold text-slate-800 mb-8 text-center border-b-4 border-blue-500 inline-block mx-auto pb-2">Kesimpulan Akhir</h2>
+                    
+                    <div class="bg-white rounded-2xl shadow-xl p-8 border border-slate-100 flex-1 relative overflow-hidden">
+                        
+                        <div class="space-y-4 relative z-10">
+                            <!-- Statement 1 -->
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center gap-4 cursor-pointer hover:bg-blue-50 transition" onclick="if(state.conclRevealed === 0) revealConclusion()">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 font-bold flex items-center justify-center shrink-0">1</div>
+                                <p class="text-lg font-medium text-slate-700">Benda dikatakan <b class="text-orange-500">bergerak</b> jika... 
+                                    <span class="${state.conclRevealed >= 1 ? 'text-blue-700 font-bold fade-in ml-2' : 'hidden'}">posisinya berubah terhadap titik acuan.</span>
+                                </p>
+                                ${state.conclRevealed === 0 ? '<span class="ml-auto text-xs font-bold text-blue-500 animate-pulse">KLIK UNTUK MEMBUKA</span>' : ''}
+                            </div>
+
+                            <!-- Statement 2 -->
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center gap-4 cursor-pointer hover:bg-blue-50 transition ${state.conclRevealed >= 1 ? '' : 'opacity-50 pointer-events-none'}" onclick="if(state.conclRevealed === 1) revealConclusion()">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 font-bold flex items-center justify-center shrink-0">2</div>
+                                <p class="text-lg font-medium text-slate-700">Benda dikatakan <b class="text-orange-500">diam</b> jika... 
+                                    <span class="${state.conclRevealed >= 2 ? 'text-blue-700 font-bold fade-in ml-2' : 'hidden'}">posisinya tetap terhadap titik acuan.</span>
+                                </p>
+                                ${state.conclRevealed === 1 ? '<span class="ml-auto text-xs font-bold text-blue-500 animate-pulse">KLIK UNTUK MEMBUKA</span>' : ''}
+                            </div>
+
+                            <!-- Statement 3 -->
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center gap-4 cursor-pointer hover:bg-blue-50 transition ${state.conclRevealed >= 2 ? '' : 'opacity-50 pointer-events-none'}" onclick="if(state.conclRevealed === 2) revealConclusion()">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 font-bold flex items-center justify-center shrink-0">3</div>
+                                <p class="text-lg font-medium text-slate-700">Untuk menentukan keadaan gerak, kita wajib memiliki... 
+                                    <span class="${state.conclRevealed >= 3 ? 'text-blue-700 font-bold fade-in ml-2' : 'hidden'}">Titik Acuan.</span>
+                                </p>
+                                ${state.conclRevealed === 2 ? '<span class="ml-auto text-xs font-bold text-blue-500 animate-pulse">KLIK UNTUK MEMBUKA</span>' : ''}
+                            </div>
+                        </div>
+
+                        ${state.conclRevealed >= 3 ? `
+                            <div class="mt-8 bg-gradient-to-r from-blue-600 to-blue-800 p-6 rounded-2xl text-white text-center shadow-lg fade-in transform scale-105">
+                                <h3 class="text-xl font-medium text-blue-200 mb-2 uppercase tracking-widest text-sm">Prinsip Gerak Relatif</h3>
+                                <p class="text-2xl font-bold leading-tight">"Keadaan gerak suatu benda sifatnya relatif, bergantung pada titik acuan yang digunakan pengamat."</p>
+                            </div>
+
+                            <div class="mt-10 text-center">
+                                <p class="text-slate-500 mb-2 font-medium">Hasil Tantanganmu:</p>
+                                <p class="text-3xl font-extrabold text-slate-800">
+                                    Berhasil menjelaskan <span class="text-orange-500">${state.quizScore} dari 10</span> situasi gerak!
+                                </p>
+                                <p class="text-slate-600 mt-2">Luar biasa! Kamu telah memahami konsep dasar gerak relatif.</p>
+                            </div>
+
+                            <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+                                <button onclick="restartApp()" class="bg-white border-2 border-slate-300 hover:border-slate-400 text-slate-700 font-bold py-3 px-8 rounded-xl transition shadow-sm">
+                                    ULANGI EKSPLORASI
+                                </button>
+                                <button onclick="alert('Pembelajaran selesai! Selamat berlatih dan terus mengamati lingkungan sekitarmu.')" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-xl transition shadow-md">
+                                    SELESAI
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function attachEventListeners() {
+            // Placeholder for any specific raw DOM event listeners if needed outside inline handlers
+        }
+
+        // Start App
+        window.onload = () => {
+            updateUI();
+        };
+    </script>
+</body>
+</html>

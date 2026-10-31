@@ -1,0 +1,474 @@
+<!doctype html><html lang='id'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Clash of Calor v1.2</title><style>
+:root{--bg:#02070e;--panel:#081827;--cyan:#4ce9f4;--cyan2:#a9ffff;--muted:#98afbb;--line:rgba(100,220,235,.24);--good:#72f0a7;--gold:#f4d479;--danger:#ff7382}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Inter,Segoe UI,Arial,sans-serif;background:radial-gradient(circle at 50% 18%,#123247 0,#06131f 35%,#02070e 78%);color:#f3f8fb}
+body{overflow-x:hidden}button{font:inherit}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.24;background:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:42px 42px}
+#app{height:100vh;display:flex;flex-direction:column;overflow:hidden}.topbar{height:66px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:rgba(2,8,14,.82);backdrop-filter:blur(8px)}
+.brand{font-weight:900;letter-spacing:.1em}.brand span{color:var(--cyan)}.topmeta{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:12px}
+ .main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 320px;overflow:hidden} .arena{min-width:0;min-height:0;padding:24px;display:flex;align-items:stretch;justify-content:center;overflow:hidden}.panel{background:linear-gradient(160deg,rgba(11,30,45,.92),rgba(4,14,23,.95));border:1px solid var(--line);border-radius:18px;box-shadow:0 16px 50px rgba(0,0,0,.28)}
+ .screen{width:100%;height:100%;min-height:0;padding:28px;display:flex;flex-direction:column;overflow:hidden}.center{align-items:center;justify-content:center;text-align:center}.hidden{display:none!important}
+.eyebrow{color:var(--cyan);font-size:11px;font-weight:900;letter-spacing:.27em;text-transform:uppercase}.heroTitle{font-family:Georgia, 'Times New Roman', serif;font-size:clamp(48px,7vw,92px);line-height:.88;letter-spacing:-.035em;text-shadow:0 0 28px rgba(71,232,242,.2);margin:14px 0}.heroTitle .small{display:block;font-size:.23em;letter-spacing:.4em;color:var(--cyan);margin:11px 0}
+.core{width:96px;height:96px;border:2px solid rgba(71,232,242,.55);border-radius:50%;display:grid;place-items:center;box-shadow:0 0 34px rgba(71,232,242,.2),inset 0 0 26px rgba(71,232,242,.1)}.core:before{content:"";width:42px;height:42px;transform:rotate(45deg);border:2px solid var(--cyan);box-shadow:0 0 20px rgba(71,232,242,.5)}.core.overheat{animation:pulse .75s infinite}
+@keyframes pulse{50%{transform:scale(1.04);filter:brightness(1.2)}}@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}@keyframes flash{0%{opacity:.1;transform:scale(.94)}45%{opacity:1;transform:scale(1.03)}100%{opacity:1}}
+.fade{animation:fade .5s ease both}.flash{animation:flash .6s ease both}
+.subtitle{max-width:760px;color:var(--muted);line-height:1.6}.btn{border:1px solid rgba(157,255,255,.32);background:rgba(18,49,67,.82);color:#f3f8fb;padding:11px 15px;border-radius:12px;cursor:pointer;font-weight:800;letter-spacing:.04em}.btn:hover{border-color:var(--cyan);box-shadow:0 0 18px rgba(71,232,242,.13)}.btn.primary{background:linear-gradient(180deg,#1aa9ba,#0b687b);border-color:rgba(157,255,255,.7)}.btn.big{padding:16px 22px;font-size:17px}
+.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;max-height:42vh;overflow:auto;padding-right:2px}.card{padding:13px;border:1px solid var(--line);border-radius:13px;background:rgba(3,13,22,.72)}.card strong{display:block;margin:5px 0}.card small{color:var(--muted)}
+.qhead{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px;letter-spacing:.11em;text-transform:uppercase}.progress{height:8px;border:1px solid var(--line);background:#06111b;border-radius:99px;overflow:hidden;margin-top:12px}.progress>div{height:100%;background:linear-gradient(90deg,#0e7181,var(--cyan));transition:.25s}
+.timer{font-size:50px;font-weight:900;color:var(--cyan);text-shadow:0 0 18px rgba(71,232,242,.35);text-align:center;margin-top:14px}.qtext{font-size:clamp(24px,2.8vw,38px);line-height:1.25;text-align:center;margin:12px 0 18px}.thinkBox{max-width:900px;width:100%;margin:auto;padding:20px;border:1px solid rgba(100,220,235,.18);border-radius:16px;background:rgba(4,15,24,.65);text-align:center}.thinkBox b{font-size:22px}.thinkBox{flex:0 0 auto}
+.footerbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:auto;padding-top:14px}.tag{padding:7px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+ .sidebar{min-width:0;min-height:0;border-left:1px solid var(--line);background:rgba(2,9,16,.5);padding:20px;display:flex;flex-direction:column;overflow:hidden}.sideTitle{font:32px Georgia,serif}.sideSub{font-size:10px;color:var(--muted);letter-spacing:.15em}.ranklist{display:flex;flex-direction:column;gap:8px;overflow:auto;margin-top:10px}.rank{display:grid;grid-template-columns:34px 1fr auto;gap:8px;align-items:center;padding:10px;border:1px solid rgba(115,220,235,.12);border-radius:12px;background:rgba(5,18,28,.7)}.rank.top{border-color:rgba(244,212,121,.38)}.rank .pos{color:var(--muted);font-weight:900}.rank .nm{font-weight:800}.rank .score{color:var(--cyan2);font-weight:900}.rank .heat{grid-column:2/4;font-size:9px;color:var(--muted);margin-top:-4px}
+.modal{position:fixed;inset:0;background:rgba(0,5,9,.86);backdrop-filter:blur(8px);display:grid;place-items:center;z-index:30;padding:18px}.modalCard{width:min(900px,96vw);max-height:92vh;overflow:auto;padding:24px}
+.lockSequence{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-top:14px}.lockSlot{padding:11px 7px;border:1px solid rgba(115,220,235,.15);border-radius:12px;background:rgba(4,14,24,.72);text-align:center;min-height:78px}.lockSlot.active{border-color:var(--cyan);box-shadow:0 0 22px rgba(71,232,242,.15)}.lockSlot.done{border-color:rgba(114,240,167,.34)}.lockSlot .num{font-size:9px;color:var(--muted);letter-spacing:.1em}.lockSlot .who{font-weight:800;margin-top:5px}.lockSlot .state{font-size:9px;color:var(--cyan);margin-top:4px}
+.gridPlayers{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:15px}.playerBtn{padding:11px 8px;border:1px solid var(--line);border-radius:12px;background:rgba(7,24,37,.82);color:#f3f8fb;cursor:pointer}.playerBtn.selected{border-color:var(--cyan);box-shadow:0 0 22px rgba(71,232,242,.16)}.playerBtn.locked{opacity:.45;cursor:default}
+.freeze{padding:17px;text-align:center;border:1px solid rgba(71,232,242,.2);border-radius:14px;background:rgba(5,17,28,.75)}.bigChoice{font-size:28px;font-weight:900;color:var(--cyan2)}.answers{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:11px}.answer{min-height:80px;text-align:left;padding:16px;border:1px solid var(--line);border-radius:14px;background:rgba(7,24,37,.85);color:#f3f8fb;cursor:pointer;font-size:18px}.answer:hover{border-color:var(--cyan);box-shadow:0 0 20px rgba(71,232,242,.12)}.answer .letter{display:inline-grid;place-items:center;width:32px;height:32px;border:1px solid var(--line);border-radius:9px;margin-right:9px;color:var(--cyan);font-weight:900}
+.revealStage{min-height:220px;display:grid;place-items:center}.revealAnswer{font:900 clamp(54px,8vw,100px)/.9 Georgia,serif}.revealAnswer small{display:block;font:900 11px Inter,Segoe UI,Arial,sans-serif;color:var(--cyan);letter-spacing:.2em;margin-bottom:12px}.revealGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-top:13px}.revealCard{padding:12px 8px;text-align:center;border:1px solid var(--line);border-radius:12px;background:rgba(4,14,24,.72)}.revealCard.good{border-color:rgba(114,240,167,.38)}.revealCard.bad{border-color:rgba(255,115,130,.35)}.delta{font-size:28px;font-weight:900}
+.alert{padding:16px;border:1px solid rgba(244,212,121,.35);border-radius:14px;background:rgba(80,62,25,.15);max-width:760px;text-align:left;line-height:1.6}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;width:min(820px,100%);margin-top:12px}.stat{padding:14px;border:1px solid var(--line);border-radius:12px;text-align:center}.stat b{display:block;font-size:24px;color:var(--cyan)}.stat span{font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}.finalRankGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:min(820px,100%);margin-top:14px}.finalRankItem{display:grid;grid-template-columns:42px 1fr auto;gap:8px;align-items:center;padding:10px;border:1px solid rgba(115,220,235,.12);border-radius:11px;background:rgba(5,18,28,.7)}
+@media(max-width:1000px){.main{grid-template-columns:1fr}.sidebar{display:none}.cards{grid-template-columns:repeat(3,1fr)}}@media(max-width:650px){.arena{padding:12px}.screen{padding:18px;min-height:calc(100vh - 95px)}.cards{grid-template-columns:1fr 1fr}.gridPlayers{grid-template-columns:repeat(3,1fr)}.lockSequence{grid-template-columns:repeat(2,1fr)}.answers{grid-template-columns:1fr}.revealGrid{grid-template-columns:repeat(2,1fr)}.stats,.finalRankGrid{grid-template-columns:1fr 1fr}.topbar{padding:0 12px}.topmeta{gap:8px}.topmeta span{display:none}}
+
+.clashHint{padding:13px 15px;border:1px solid rgba(71,232,242,.2);border-radius:13px;background:rgba(4,15,24,.7);line-height:1.5;color:#d8ebf0}
+.freePlayer{position:relative}.freePlayer.ready{border-color:rgba(71,232,242,.38);box-shadow:0 0 18px rgba(71,232,242,.08)}
+.freePlayer.ready:after{content:"TAP TO LOCK";position:absolute;right:7px;top:7px;font-size:8px;letter-spacing:.08em;color:var(--cyan)}
+.freePlayer.locked:after{content:"LOCKED";position:absolute;right:7px;top:7px;font-size:8px;letter-spacing:.08em;color:var(--good)}
+.lockedBanner{padding:15px;border:1px solid rgba(114,240,167,.3);border-radius:13px;background:rgba(25,77,52,.14);text-align:center}
+.smallcaps{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+
+.screen.center{align-items:center;justify-content:center;text-align:center}
+.startContent{width:min(820px,92%);margin:auto}
+.setupContent{width:100%;max-width:980px;margin:auto}
+.gameContent{width:100%;max-width:1080px;margin:0 auto;min-height:0;display:flex;flex-direction:column}
+.questionArea{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-start}
+.questionArea .thinkBox{margin-top:8px}
+#rankList,#lbBig{min-height:0}
+.sidebar .ranklist{flex:1;overflow:auto;scrollbar-width:thin}
+@media(max-width:1000px){.main{grid-template-columns:1fr}.sidebar{display:none}}
+
+
+.logoLockup{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;line-height:.86;text-align:center}
+.logoClash,.logoCalor{font-family:Georgia,'Times New Roman',serif;font-weight:700;letter-spacing:.055em;text-shadow:0 0 24px rgba(71,232,242,.18);white-space:nowrap}
+.logoClash{font-size:clamp(48px,7vw,86px)}
+.logoOf{font:700 clamp(11px,1.2vw,16px)/1 Inter,Arial,sans-serif;letter-spacing:.42em;color:var(--cyan);margin-left:.42em}
+.logoCalor{font-size:clamp(42px,6.5vw,78px);margin-left:.04em}
+.logoMark{position:relative;width:104px;height:104px;border:1px solid rgba(71,232,242,.45);border-radius:50%;display:grid;place-items:center;margin:13px auto;box-shadow:0 0 42px rgba(71,232,242,.18),inset 0 0 28px rgba(71,232,242,.09)}
+.logoMark:before{content:"";width:48px;height:48px;transform:rotate(45deg);border:2px solid var(--cyan);box-shadow:0 0 20px rgba(71,232,242,.5)}
+.logoMark:after{content:"Q = m · c · ΔT";position:absolute;bottom:-22px;font:800 8px Inter,Arial,sans-serif;letter-spacing:.12em;color:var(--muted);white-space:nowrap}
+.phaseBadge{display:inline-flex;align-items:center;gap:8px;padding:8px 11px;border:1px solid rgba(71,232,242,.2);border-radius:999px;background:rgba(4,15,24,.55);font-size:10px;color:var(--muted);letter-spacing:.12em}
+.audioPanel{position:fixed;right:18px;bottom:18px;z-index:25;width:min(360px,calc(100vw - 36px));padding:15px;border:1px solid var(--line);border-radius:15px;background:rgba(4,14,23,.95);box-shadow:0 14px 45px rgba(0,0,0,.35);backdrop-filter:blur(8px)}
+.audioRow{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.audioPanel input[type=file]{width:100%;font-size:11px;color:var(--muted)}
+.audioPanel input[type=range]{width:140px}.audioPhase{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.audioPhase button{font-size:10px;padding:9px}.audioStatus{font-size:10px;color:var(--muted);line-height:1.45;margin-top:7px}
+.hiddenAudio{display:none!important}
+@media(max-width:650px){.audioPanel{left:12px;right:12px;width:auto}.audioPhase{grid-template-columns:1fr 1fr}}
+
+
+.clashQuestionRecap{padding:15px 17px;border:1px solid rgba(71,232,242,.22);border-radius:14px;background:linear-gradient(160deg,rgba(9,30,43,.88),rgba(4,15,24,.94));margin:12px 0}
+.clashQuestionRecap .qRecapText{font-size:20px;line-height:1.35;margin-top:6px;color:#f4f8fb}
+.clashMetaLine{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.12em}
+</style></head><body>
+<div id="app">
+<header class="topbar"><div class="brand">CLASH <span>OF</span> CALOR</div><div class="topmeta"><span id="modeLabel">TEACHER MODE</span><span id="roundLabel">READY</span><span id="timerMini">00:00</span><button id="audioOpen" class="btn">♫ AUDIO</button></div></header>
+<div class="main"><main class="arena">
+<section id="startScreen" class="panel screen center"><div class="startContent">
+<div class="eyebrow">UPTD SMPN 1 BURNEH • SCIENCE COMPETITION</div><div class="logoLockup">
+  <div class="logoClash">CLASH</div>
+  <div class="logoOf">OF</div>
+  <div class="logoCalor">CALOR</div>
+  <div class="logoMark"></div>
+</div>
+<p class="subtitle">Think Fast. Calculate Right.<br>25 players • 4 levels • 1 thermal arena.</p>
+<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><button id="startBtn" class="btn primary big" type="button">START GAME</button><button id="viewPlayersBtn" class="btn big" type="button">VIEW PLAYERS</button></div>
+<div class="tag" style="margin-top:12px">Clash of Calor v2.0 • Fair Rotation • Offline • IFP-first</div></div></section>
+<section id="cinematicScreen" class="panel screen center hidden"><div class="startContent"><div class="eyebrow fade">UPTD SMPN 1 BURNEH • SCIENCE COMPETITION</div><div class="logoLockup fade">
+  <div class="logoClash">CLASH</div>
+  <div class="logoOf">OF</div>
+  <div class="logoCalor">CALOR</div>
+  <div class="logoMark"></div>
+</div><p class="subtitle">25 CONTENDERS • 20 CHALLENGES • ONE CALOR CHAMPION</p><div id="cinematicCount" class="timer">3</div></div></section>
+<section id="setupScreen" class="panel screen hidden"><div class="setupContent"><div class="eyebrow">GAME SETUP</div><h2 style="font:38px Georgia,serif;margin:8px 0">Choose the Clash rotation</h2><p class="subtitle">Semua siswa mengerjakan setiap soal di lembar. Lima siswa dalam satu pool mendapat giliran lock-in di IFP.</p><div class="alert" style="margin:12px auto;max-width:820px;text-align:center"><b>FAIR ROTATION:</b> 20 soal = 4 level × 5 soal. Setiap siswa mendapat <b>4 kesempatan CLASH</b> — tepat 1 kali di setiap level.</div><div id="poolCards" class="cards"></div><div style="margin-top:18px"><button id="beginRoundBtn" class="btn primary">BEGIN ROUND 1</button></div></div></section>
+<section id="gameScreen" class="panel screen hidden"><div class="gameContent"><div class="qhead"><span id="levelText">CALOR BASIC</span><span>SOAL <b id="qNum">1</b> / <b>20</b></span></div><div class="progress"><div id="progressBar" style="width:5.5%"></div></div><div class="timer" id="timer">20</div><div class="qtext" id="questionText"></div><div id="answerArea"></div><div class="footerbar"><span class="tag" id="poolTag">CLASH POOL A</span><span class="tag" id="questionScoreTag">+100 BASE</span><div style="display:flex;gap:8px"><button id="lbBtn" class="btn">LEADERBOARD</button><button id="pauseBtn" class="btn">PAUSE</button></div></div></div></section>
+<section id="resultScreen" class="panel screen hidden center"><div class="eyebrow" id="resultEyebrow">ANSWER REVEAL</div><div class="heroTitle" style="font-size:56px" id="resultTitle">THE REVEAL</div><div id="resultMessage" style="width:100%"></div><div id="resultExplanation" style="width:100%;max-width:900px"></div><div style="display:flex;gap:10px;margin-top:18px"><button id="nextBtn" class="btn primary big">NEXT QUESTION</button><button id="lbBtn2" class="btn big">LEADERBOARD</button></div></section>
+<section id="momentScreen" class="panel screen hidden center"><div class="eyebrow">CLUTCH MOMENT</div><div class="heroTitle" style="font-size:60px">RANKING SHIFT</div><div id="momentText" style="font-size:25px"></div><button id="momentBtn" class="btn primary big" style="margin-top:18px">CONTINUE</button></section>
+<section id="classCheckScreen" class="panel screen hidden center"><div class="eyebrow">CLASS CHECK</div><div class="heroTitle" style="font-size:54px">PAUSE THE CLASH</div><div class="alert"><b id="classCheckTitle">CLASS CHECK</b><p id="classCheckText"></p></div><button id="resumeCheckBtn" class="btn primary big" style="margin-top:18px">RESUME CLASH</button></section>
+<section id="finalScreen" class="panel screen hidden center"><div class="startContent"><div class="eyebrow">THE HEAT CALCULATION CHAMPIONSHIP</div><div class="logoLockup"><div class="logoCalor" style="font-size:64px">CALOR</div><div class="logoOf" style="margin-top:3px">CHAMPION</div></div><div class="core"></div><h2 id="championName" style="font:38px Georgia,serif"></h2><div id="finalStats" class="stats"></div><button id="playAgainBtn" class="btn primary big" style="margin-top:18px">PLAY AGAIN</button></div></section>
+</main>
+<aside class="sidebar"><div><div class="sideSub">LIVE</div><div class="sideTitle">RANKING</div></div><div id="rankList" class="ranklist"></div><div class="footerbar"><span class="tag">25 PLAYERS</span><span class="tag">THERMAL CORE ONLINE</span></div></aside></div>
+
+<div id="audioPanel" class="audioPanel hidden">
+  <div class="audioRow">
+    <div class="eyebrow" style="margin-right:auto">AUDIO CONTROL</div>
+    <button id="audioClose" class="btn">CLOSE</button>
+  </div>
+  <div class="audioRow" style="margin-top:8px">
+    <button id="audioOriginal" class="btn primary">▶ PLAY ARENA MUSIC</button>
+    <button id="audioStop" class="btn">STOP</button>
+    <label class="smallcaps" style="display:flex;align-items:center;gap:7px">VOL <input id="audioVolume" type="range" min="0" max="1" step=".01" value=".6"></label>
+  </div>
+  <div class="audioPhase">
+    <button id="audioPhaseOpening" class="btn">OPENING TRACK</button>
+    <button id="audioPhaseThink" class="btn">THINK TRACK</button>
+    <button id="audioPhaseClash" class="btn">CLASH TRACK</button>
+    <button id="audioPhaseBoss" class="btn">BOSS TRACK</button>
+  </div>
+  <input id="audioFile" type="file" accept="audio/*" style="margin-top:9px">
+  <div class="audioStatus" id="audioStatus">
+    Pilih MP3/WAV milikmu untuk digunakan secara lokal di sesi ini. Tidak ada file yang dikirim ke internet.
+  </div>
+</div>
+<div id="playerModal" class="modal hidden"><div class="modalCard panel"><div class="eyebrow">PLAYER ROSTER</div><h2 style="font:35px Georgia,serif">25 Contestants</h2><div id="playerGrid" class="gridPlayers"></div><button id="closePlayers" class="btn" style="margin-top:16px">CLOSE</button></div></div>
+<div id="clashModal" class="modal hidden">
+<div class="modalCard panel">
+  <div class="eyebrow">CLASH PHASE</div>
+  <h2 style="font:39px Georgia,serif;margin:6px 0">FREE-FOR-ALL LOCK-IN</h2>
+  <div class="clashQuestionRecap">
+    <div class="clashMetaLine"><span id="clashLevel">CURRENT QUESTION</span><span id="clashQuestionNo">SOAL 1 / 20</span></div>
+    <div id="clashQuestionText" class="qRecapText"></div>
+  </div>
+  <div class="clashHint">
+    <b>Aturan cepat:</b> kelima pemain boleh berebut menyentuh nama mereka kapan saja.
+    Tidak ada giliran wajib. Begitu seorang pemain memilih namanya, ia langsung memilih jawaban.
+    Pemain yang paling cepat <b>mengunci jawaban</b> mendapat bonus lebih besar.
+  </div>
+  <div id="lockSequence" class="lockSequence"></div><div id="clashPlayers" class="gridPlayers"></div>
+  <div style="margin-top:14px" id="selectedPlayerArea" class="hidden">
+    <div class="freeze">
+      <div class="smallcaps">PLAYER LOCKING</div>
+      <div id="selectedPlayerName" class="bigChoice"></div>
+      <div style="color:var(--muted);margin-top:4px">Pilih jawabanmu sekarang.</div>
+    </div>
+    <div id="clashAnswerArea" class="answers"></div>
+  </div>
+  <div id="clashProgressArea" style="margin-top:15px" class="lockedBanner hidden">
+    <b id="clashProgressText">0 / 5 LOCKED</b>
+    <div style="color:var(--muted);margin-top:4px">Hasil belum direveal sampai kelima pemain selesai.</div>
+  </div>
+  <div id="allLockedArea" class="lockedBanner hidden" style="margin-top:10px"><b>FIVE LOCKED — REVEAL READY</b></div><div style="display:flex;justify-content:flex-end;margin-top:16px">
+    <button id="revealBtn" class="btn primary hidden" disabled>REVEAL ANSWERS</button>
+  </div>
+</div>
+</div>
+<div id="pauseModal" class="modal hidden"><div class="modalCard panel center" style="width:min(500px,95vw)"><div class="eyebrow">PAUSED</div><div class="heroTitle" style="font-size:48px">GAME PAUSED</div><button id="resumeBtn" class="btn primary big">RESUME</button></div></div>
+<div id="lbModal" class="modal hidden"><div class="modalCard panel"><div class="eyebrow">LIVE SCORE</div><h2 style="font:38px Georgia,serif">CURRENT RANKING</h2><div id="lbBig" class="ranklist"></div><button id="closeLB" class="btn" style="margin-top:16px">CLOSE</button></div></div>
+<div id="toast" class="hidden" style="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:60;background:#0b2635;border:1px solid var(--cyan);padding:11px 16px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.35)"></div>
+<script>
+const PLAYERS = [{"id": "01", "name": "Fajrin"}, {"id": "02", "name": "Azmina"}, {"id": "03", "name": "Claudia"}, {"id": "04", "name": "Faizah"}, {"id": "05", "name": "Fariz"}, {"id": "06", "name": "Fatima"}, {"id": "07", "name": "Habil"}, {"id": "08", "name": "Irfan"}, {"id": "09", "name": "Akbar"}, {"id": "10", "name": "Sofia"}, {"id": "11", "name": "Hanafi"}, {"id": "12", "name": "Mila"}, {"id": "13", "name": "Rafli"}, {"id": "14", "name": "Hera"}, {"id": "15", "name": "Firdi"}, {"id": "16", "name": "Novi"}, {"id": "17", "name": "Anis"}, {"id": "18", "name": "Rizky"}, {"id": "19", "name": "Putri"}, {"id": "20", "name": "Refan"}, {"id": "21", "name": "Rehan"}, {"id": "22", "name": "Safira"}, {"id": "23", "name": "Sandi"}, {"id": "24", "name": "Nisa"}, {"id": "25", "name": "Fahmi"}];
+const QUESTIONS = [{"level": "CALOR BASIC", "q": "Sebuah benda bermassa 2 kg memiliki kalor jenis 500 J/(kg·°C). Suhunya naik dari 20°C menjadi 50°C. Berapakah kalor yang diterima benda?", "opts": ["20.000 J", "30.000 J", "40.000 J", "50.000 J"], "a": 1, "value": 100, "explain": "ΔT = 50 − 20 = 30°C. Q = m·c·ΔT = 2 × 500 × 30 = 30.000 J."}, {"level": "CALOR BASIC", "q": "Air bermassa 2 kg dipanaskan dari 25°C menjadi 80°C. Jika c air = 4.200 J/(kg·°C), berapakah kalor yang diperlukan?", "opts": ["231.000 J", "420.000 J", "462.000 J", "504.000 J"], "a": 2, "value": 100, "explain": "ΔT = 80 − 25 = 55°C. Q = 2 × 4.200 × 55 = 462.000 J."}, {"level": "CALOR BASIC", "q": "Sebuah aluminium bermassa 1,5 kg memiliki c = 900 J/(kg·°C) dan dipanaskan 20°C. Besar kalor yang diterima adalah…", "opts": ["13.500 J", "27.000 J", "36.000 J", "54.000 J"], "a": 1, "value": 100, "explain": "Q = 1,5 × 900 × 20 = 27.000 J."}, {"level": "CALOR BASIC", "q": "Jika m = 3 kg, c = 400 J/(kg·°C), dan ΔT = 25°C, maka Q = …", "opts": ["10.000 J", "20.000 J", "30.000 J", "40.000 J"], "a": 2, "value": 100, "explain": "Q = 3 × 400 × 25 = 30.000 J."}, {"level": "CALOR BASIC", "q": "Sebuah benda menerima kalor 24.000 J. Jika massanya 2 kg dan ΔT = 20°C, kalor jenis benda adalah…", "opts": ["400 J/(kg·°C)", "500 J/(kg·°C)", "600 J/(kg·°C)", "700 J/(kg·°C)"], "a": 2, "value": 100, "explain": "c = Q/(m·ΔT) = 24.000/(2×20) = 600 J/(kg·°C)."}, {"level": "TEMPERATURE CLASH", "q": "Besi didinginkan dari 100°C menjadi 20°C. Nilai ΔT adalah…", "opts": ["−120°C", "−80°C", "+80°C", "+120°C"], "a": 1, "value": 100, "explain": "ΔT = Takhir − Tawal = 20 − 100 = −80°C. Tanda negatif menunjukkan penurunan suhu."}, {"level": "TEMPERATURE CLASH", "q": "Sebuah benda dipanaskan dari −10°C menjadi 30°C. ΔT adalah…", "opts": ["20°C", "30°C", "40°C", "−40°C"], "a": 2, "value": 100, "explain": "ΔT = 30 − (−10) = 40°C."}, {"level": "TEMPERATURE CLASH", "q": "Benda bersuhu 75°C didinginkan hingga 25°C. Jika Q = m·c·ΔT, tanda Q secara perhitungan adalah…", "opts": ["Positif", "Negatif", "Selalu nol", "Tidak dapat ditentukan"], "a": 1, "value": 100, "explain": "Karena ΔT negatif pada proses pendinginan, Q bernilai negatif untuk benda yang melepaskan kalor."}, {"level": "TEMPERATURE CLASH", "q": "Suhu awal suatu benda 15°C. Setelah menerima kalor, suhunya menjadi 55°C. ΔT = …", "opts": ["−40°C", "+40°C", "+70°C", "−70°C"], "a": 1, "value": 100, "explain": "ΔT = 55 − 15 = +40°C."}, {"level": "TEMPERATURE CLASH", "q": "Manakah urutan penulisan ΔT yang benar?", "opts": ["Tawal − Takhir", "Takhir − Tawal", "Tawal + Takhir", "Takhir ÷ Tawal"], "a": 1, "value": 100, "explain": "Gunakan ΔT = Takhir − Tawal."}, {"level": "VARIABLE HUNT", "q": "Sebuah benda menerima kalor 60.000 J. Jika c = 500 J/(kg·°C) dan ΔT = 20°C, massanya adalah…", "opts": ["3 kg", "4 kg", "5 kg", "6 kg"], "a": 3, "value": 150, "explain": "m = Q/(c·ΔT) = 60.000/(500×20) = 6 kg."}, {"level": "VARIABLE HUNT", "q": "Kalor 84.000 J diberikan pada 2 kg zat sehingga suhunya naik 20°C. Kalor jenis zat tersebut adalah…", "opts": ["1.800 J/(kg·°C)", "2.100 J/(kg·°C)", "2.400 J/(kg·°C)", "4.200 J/(kg·°C)"], "a": 1, "value": 150, "explain": "c = 84.000/(2×20) = 2.100 J/(kg·°C)."}, {"level": "VARIABLE HUNT", "q": "Sebuah logam c = 400 J/(kg·°C), menerima 32.000 J, dan mengalami kenaikan suhu 40°C. Massa logam adalah…", "opts": ["1 kg", "2 kg", "3 kg", "4 kg"], "a": 1, "value": 150, "explain": "m = 32.000/(400×40) = 2 kg."}, {"level": "VARIABLE HUNT", "q": "Jika Q = 45.000 J, m = 3 kg, dan c = 500 J/(kg·°C), perubahan suhu benda adalah…", "opts": ["15°C", "20°C", "30°C", "45°C"], "a": 2, "value": 150, "explain": "ΔT = Q/(m·c) = 45.000/(3×500) = 30°C."}, {"level": "VARIABLE HUNT", "q": "Suatu benda bermassa 4 kg memiliki c = 250 J/(kg·°C). Agar menerima 20.000 J, benda harus mengalami perubahan suhu sebesar…", "opts": ["10°C", "20°C", "30°C", "40°C"], "a": 1, "value": 150, "explain": "ΔT = 20.000/(4×250) = 20°C."}, {"level": "BOSS BATTLE", "q": "Daging bermassa 10 kg memiliki kalor jenis 3.500 J/(kg·K). Suhu berubah dari 27°C menjadi −10°C. Besar kalor yang dilepaskan daging adalah…", "opts": ["1.295.000 J", "1.050.000 J", "1.295.000.000 J", "129.500 J"], "a": 0, "value": 300, "explain": "ΔT = −10 − 27 = −37°C. Q = 10 × 3.500 × (−37) = −1.295.000 J. Besarnya kalor yang dilepaskan = 1.295.000 J."}, {"level": "BOSS BATTLE", "q": "Suatu zat bermassa 2,5 kg menerima kalor 75.000 J dan suhunya naik dari 20°C menjadi 50°C. Kalor jenis zat adalah…", "opts": ["500 J/(kg·°C)", "750 J/(kg·°C)", "1.000 J/(kg·°C)", "1.250 J/(kg·°C)"], "a": 2, "value": 300, "explain": "ΔT = 30°C. c = 75.000/(2,5×30) = 1.000 J/(kg·°C)."}, {"level": "BOSS BATTLE", "q": "Sebuah benda menerima 96.000 J sehingga suhunya naik 40°C. Jika kalor jenisnya 800 J/(kg·°C), massa benda adalah…", "opts": ["2 kg", "3 kg", "4 kg", "5 kg"], "a": 1, "value": 300, "explain": "m = 96.000/(800×40) = 3 kg."}, {"level": "BOSS BATTLE", "q": "Sebanyak 4 kg air didinginkan dari 90°C menjadi 40°C. Jika kalor jenis air 4.200 J/(kg·°C), besar kalor yang dilepaskan air adalah…", "opts": ["420.000 J", "630.000 J", "840.000 J", "1.008.000 J"], "a": 2, "value": 300, "explain": "ΔT = 40 − 90 = −50°C. Q = 4 × 4.200 × (−50) = −840.000 J. Besarnya kalor yang dilepaskan = 840.000 J."}, {"level": "BOSS BATTLE", "q": "Sebuah logam bermassa 3 kg menerima kalor 54.000 J sehingga suhunya naik dari 20°C menjadi 50°C. Kalor jenis logam tersebut adalah…", "opts": ["400 J/(kg·°C)", "500 J/(kg·°C)", "600 J/(kg·°C)", "900 J/(kg·°C)"], "a": 2, "value": 300, "explain": "ΔT = 50 − 20 = 30°C. c = Q/(m·ΔT) = 54.000/(3×30) = 600 J/(kg·°C)."}];
+const state={scores:Object.fromEntries(PLAYERS.map(p=>[p.id,0])),stats:Object.fromEntries(PLAYERS.map(p=>[p.id,{correct:0,attempts:0,streak:0,bestStreak:0,clashWins:0}])),qIndex:0,poolIndex:0,timerId:null,remaining:20,paused:false,clashOrder:[],clashAnswers:{},currentPlayer:null,beforeScores:{},lastReport:[],clashTimes:{}};
+const pools=[PLAYERS.slice(0,5),PLAYERS.slice(5,10),PLAYERS.slice(10,15),PLAYERS.slice(15,20),PLAYERS.slice(20,25)];
+const $=id=>document.getElementById(id);
+function show(id){["startScreen","cinematicScreen","setupScreen","gameScreen","resultScreen","momentScreen","classCheckScreen","finalScreen"].forEach(x=>$(x).classList.add("hidden"));$(id).classList.remove("hidden")}
+function toast(msg){const t=$("toast");t.textContent=msg;t.classList.remove("hidden");clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.add("hidden"),1500)}
+function renderRanking(target="rankList"){const sorted=[...PLAYERS].sort((a,b)=>state.scores[b.id]-state.scores[a.id]||Number(a.id)-Number(b.id));$(target).innerHTML=sorted.map((p,i)=>{const st=state.stats[p.id],heat=Math.min(100,20+st.streak*20);return `<div class="rank ${i<3?"top":""}"><div class="pos">${i===0?"🥇":i===1?"🥈":i===2?"🥉":i+1}</div><div class="nm">#${p.id} ${p.name}</div><div class="score">${state.scores[p.id].toLocaleString("id-ID")}</div><div class="heat">HEAT ${"█".repeat(Math.max(1,Math.ceil(heat/14)))}${"░".repeat(Math.max(0,7-Math.ceil(heat/14)))} • STREAK ${st.streak}</div></div>`}).join("")}
+function resetState(){state.scores=Object.fromEntries(PLAYERS.map(p=>[p.id,0]));state.stats=Object.fromEntries(PLAYERS.map(p=>[p.id,{correct:0,attempts:0,streak:0,bestStreak:0,clashWins:0}]));state.qIndex=0;state.poolIndex=0;state.clashOrder=[];state.clashAnswers={};state.currentPlayer=null;state.clashTimes={}}
+
+
+let localAudio = null;
+let localAudioUrl = null;
+let audioVolume = 0.6;
+let audioTrackName = "";
+let audioPhase = "opening";
+let arenaGain = null;
+let arenaTimer = null;
+let arenaStep = 0;
+let arenaStarted = false;
+
+function ensureAudioContext(){
+  if(!window.arenaAudioCtx){
+    window.arenaAudioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    arenaGain = window.arenaAudioCtx.createGain();
+    arenaGain.gain.value = audioVolume;
+    arenaGain.connect(window.arenaAudioCtx.destination);
+  }
+  if(window.arenaAudioCtx.state === "suspended") return window.arenaAudioCtx.resume();
+  return Promise.resolve();
+}
+function setAudioStatus(msg){
+  const el=$("audioStatus");
+  if(el) el.textContent=msg;
+}
+function stopLocalAudio(){
+  if(localAudio){
+    try{localAudio.pause()}catch(e){}
+    try{localAudio.currentTime=0}catch(e){}
+  }
+}
+function stopOriginalArena(){
+  if(arenaTimer){clearTimeout(arenaTimer);arenaTimer=null;}
+  arenaStarted=false;
+}
+function playTone(freq,dur,type,vol,when){
+  const ctx=window.arenaAudioCtx;
+  if(!ctx || !arenaGain) return;
+  const osc=ctx.createOscillator(), gain=ctx.createGain();
+  osc.type=type;
+  osc.frequency.setValueAtTime(freq,when);
+  gain.gain.setValueAtTime(0.0001,when);
+  gain.gain.exponentialRampToValueAtTime(Math.max(0.0001,vol*audioVolume),when+0.02);
+  gain.gain.exponentialRampToValueAtTime(0.0001,when+dur);
+  osc.connect(gain); gain.connect(arenaGain);
+  osc.start(when);osc.stop(when+dur+0.03);
+}
+function scheduleArenaStep(){
+  if(!arenaStarted || !window.arenaAudioCtx) return;
+  const ctx=window.arenaAudioCtx;
+  const step=arenaStep++;
+  const bpm = audioPhase==="boss" ? 118 : audioPhase==="clash" ? 112 : audioPhase==="think" ? 96 : 86;
+  const beat=60/bpm;
+  const scales = {
+    opening:[55,65.41,73.42,82.41,98,82.41,73.42,65.41],
+    think:[65.41,73.42,82.41,98,110,98,82.41,73.42],
+    clash:[55,65.41,73.42,98,110,98,73.42,65.41],
+    boss:[43.65,55,65.41,73.42,87.31,98,110,130.81]
+  };
+  const notes=scales[audioPhase]||scales.opening;
+  const root=notes[step%notes.length];
+  const now=ctx.currentTime+0.015;
+  playTone(root, beat*0.72, audioPhase==="boss"?"sawtooth":"triangle", 0.048, now);
+  if(step%2===0) playTone(root*2, beat*0.34, "sine", 0.018, now+0.04);
+  if(step%4===0) playTone(root*1.5, beat*0.22, "triangle", 0.012, now+0.08);
+  arenaTimer=setTimeout(scheduleArenaStep, beat*1000*0.92);
+}
+function setAudioPhase(phase){
+  audioPhase=phase;
+  if(localAudio && !localAudio.paused){
+    setAudioStatus(`Custom track sedang berjalan • phase: ${phase}`);
+    return;
+  }
+  if(arenaStarted){
+    stopOriginalArena();
+    startOriginalArena(phase);
+  }
+}
+async function startOriginalArena(phase="opening"){
+  audioPhase=phase;
+  try{
+    await ensureAudioContext();
+    stopLocalAudio();
+    stopOriginalArena();
+    arenaStep=0;
+    arenaStarted=true;
+    scheduleArenaStep();
+    setAudioStatus(`Original Arena Music • ${phase.toUpperCase()}`);
+    $("audioOriginal").textContent="■ RESTART ARENA MUSIC";
+  }catch(e){
+    setAudioStatus("Audio gagal diaktifkan. Tekan PLAY ARENA MUSIC sekali lagi.");
+  }
+}
+function loadAudioFile(file){
+  if(!file) return;
+  stopLocalAudio();
+  stopOriginalArena();
+  if(localAudioUrl) URL.revokeObjectURL(localAudioUrl);
+  localAudioUrl=URL.createObjectURL(file);
+  localAudio=new Audio(localAudioUrl);
+  localAudio.preload="auto";
+  localAudio.loop=true;
+  localAudio.volume=audioVolume;
+  audioTrackName=file.name;
+  setAudioStatus(`Loaded custom track: ${file.name}`);
+}
+async function playCustomOrArena(phase){
+  setAudioPhase(phase);
+  if(localAudio){
+    stopOriginalArena();
+    localAudio.volume=audioVolume;
+    try{
+      await localAudio.play();
+      setAudioStatus(`Playing custom track • ${audioTrackName} • ${phase.toUpperCase()}`);
+    }catch(e){
+      setAudioStatus("Custom audio belum dapat diputar. Browser meminta interaksi pengguna lagi.");
+    }
+  }else{
+    startOriginalArena(phase);
+  }
+}
+function setMusicVolume(v){
+  audioVolume=Number(v);
+  if(arenaGain) arenaGain.gain.value=audioVolume;
+  if(localAudio) localAudio.volume=audioVolume;
+}
+function openAudio(){$("audioPanel").classList.remove("hidden")}
+function closeAudio(){$("audioPanel").classList.add("hidden")}
+function init(){
+ $("audioOpen").addEventListener("click",openAudio);
+ $("audioClose").addEventListener("click",closeAudio);
+ $("audioStop").addEventListener("click",()=>{stopLocalAudio();stopOriginalArena();setAudioStatus("Audio dihentikan.")});
+ $("audioOriginal").addEventListener("click",()=>playCustomOrArena(audioPhase));
+ $("audioVolume").addEventListener("input",e=>setMusicVolume(e.target.value));
+ $("audioFile").addEventListener("change",e=>loadAudioFile(e.target.files[0]));
+ $("audioPhaseOpening").addEventListener("click",()=>playCustomOrArena("opening"));
+ $("audioPhaseThink").addEventListener("click",()=>playCustomOrArena("think"));
+ $("audioPhaseClash").addEventListener("click",()=>playCustomOrArena("clash"));
+ $("audioPhaseBoss").addEventListener("click",()=>playCustomOrArena("boss"));
+
+ $("startBtn").addEventListener("click",()=>{resetState();showCinematic()});
+ $("viewPlayersBtn").addEventListener("click",()=>{$("playerGrid").innerHTML=PLAYERS.map(p=>`<button class="playerBtn"><b>#${p.id}</b><br>${p.name}</button>`).join("");$("playerModal").classList.remove("hidden")});
+ $("closePlayers").addEventListener("click",()=> $("playerModal").classList.add("hidden"));
+ $("beginRoundBtn").addEventListener("click",()=>{show("gameScreen");loadQuestion()});
+ $("pauseBtn").addEventListener("click",()=>{state.paused=true;$("pauseModal").classList.remove("hidden")});
+ $("resumeBtn").addEventListener("click",()=>{state.paused=false;$("pauseModal").classList.add("hidden")});
+ $("lbBtn").addEventListener("click",()=>{$("lbModal").classList.remove("hidden");renderRanking("lbBig")});
+ $("closeLB").addEventListener("click",()=> $("lbModal").classList.add("hidden"));
+ $("lbBtn2").addEventListener("click",()=>{$("lbModal").classList.remove("hidden");renderRanking("lbBig")});
+ $("revealBtn").addEventListener("click",revealClash);
+ $("nextBtn").addEventListener("click",nextQuestion);
+ $("momentBtn").addEventListener("click",()=>{show("resultScreen");setTimeout(maybeClassCheck,250)});
+ $("resumeCheckBtn").addEventListener("click",()=>show("resultScreen"));
+ $("playAgainBtn").addEventListener("click",()=>{resetState();showCinematic()});
+ renderRanking();
+}
+function showCinematic(){openAudio();show("cinematicScreen");$("cinematicCount").textContent="3";let n=3;clearInterval(window.__intro);window.__intro=setInterval(()=>{n--;$("cinematicCount").textContent=n>0?n:"GO";if(n<=0){clearInterval(window.__intro);setTimeout(()=>show("setupScreen"),650)}},650)}
+function loadQuestion(){closeAudio();const q=QUESTIONS[state.qIndex];clearInterval(state.timerId);$("levelText").textContent=q.level;$("roundLabel").textContent=`ROUND ${Math.floor(state.qIndex/5)+1}`;$("qNum").textContent=state.qIndex+1;$("progressBar").style.width=((state.qIndex+1)/QUESTIONS.length*100)+"%";$("questionText").textContent=q.q;$("poolTag").textContent=`CLASH POOL ${String.fromCharCode(65+state.poolIndex)} • ${pools[state.poolIndex][0].name}–${pools[state.poolIndex][4].name}`;$("questionScoreTag").textContent=`+${q.value} BASE`;$("answerArea").innerHTML=`<div class="thinkBox"><div class="eyebrow">ALL PLAY • THINK PHASE</div><div><b>Hitung di lembar Clash of Calor.</b></div><div style="color:var(--muted);margin-top:6px">Diketahui → ΔT → Rumus → Perhitungan → Satuan.<br><b>Jawaban di layar belum tersedia.</b></div></div>`;startTimer(q.level==="BOSS BATTLE"?28:20)}
+function startTimer(sec){state.remaining=sec;state.paused=false;updateTimer();clearInterval(state.timerId);state.timerId=setInterval(()=>{if(!state.paused){state.remaining--;updateTimer();if(state.remaining<=0){clearInterval(state.timerId);onTimeUp()}}},1000)}
+function updateTimer(){$("timer").textContent=String(state.remaining).padStart(2,"0");$("timerMini").textContent=`00:${String(state.remaining).padStart(2,"0")}`;document.querySelector(".core")?.classList.toggle("overheat",state.remaining<=5)}
+function onTimeUp(){$("answerArea").innerHTML=`<div class="thinkBox flash"><div class="eyebrow">THINK PHASE COMPLETE</div><div style="font-size:25px;font-weight:900">TIME'S UP!</div><div style="color:var(--muted)">Pensil berhenti. Sekarang lima pemain masuk CLASH.</div></div>`;setTimeout(openClash,600)}
+
+function updateRevealButton(){
+  const ready=Object.keys(state.clashAnswers).length===5;
+  $("revealBtn").disabled=!ready;
+  $("revealBtn").classList.toggle("hidden",!ready);
+  $("allLockedArea").classList.toggle("hidden",!ready);
+  $("clashProgressArea").classList.toggle("hidden",Object.keys(state.clashAnswers).length===0);
+}
+function renderLockSequence(){
+  const pool=pools[state.poolIndex];
+  const slots=pool.map((p,i)=>{
+    const locked=state.clashAnswers[p.id]!==undefined;
+    return `<div class="lockSlot ${locked?"done":""}">
+      <div class="num">POSITION ${i+1}</div>
+      <div class="who">${locked?p.name:"—"}</div>
+      <div class="state">${locked?"LOCKED":"READY"}</div>
+    </div>`;
+  }).join("");
+  const el=$("lockSequence");
+  if(el) el.innerHTML=slots;  updateRevealButton();
+}
+
+
+function openClash(){
+  const q=QUESTIONS[state.qIndex];
+  const pool=pools[state.poolIndex];
+  if($("clashLevel")) $("clashLevel").textContent=q.level;
+  if($("clashQuestionNo")) $("clashQuestionNo").textContent=`SOAL ${state.qIndex+1} / ${QUESTIONS.length}`;
+  if($("clashQuestionText")) $("clashQuestionText").textContent=q.q;
+
+  $("clashModal").classList.remove("hidden");
+  state.clashOrder=[]; state.clashAnswers={}; state.currentPlayer=null; state.clashTimes={};
+
+  $("selectedPlayerArea").classList.add("hidden");
+  $("clashProgressArea").classList.add("hidden");
+  $("allLockedArea").classList.add("hidden");
+  $("revealBtn").classList.add("hidden");
+  $("revealBtn").disabled=true;
+
+  // Populate the five-player free-for-all roster for this pool.
+  $("clashPlayers").innerHTML=pool.map(p=>`<button type="button" class="playerBtn clashPlayer" data-player-id="${p.id}"><b>#${p.id}</b><br>${p.name}<small> TAP TO LOCK</small></button>`).join("");
+  $("clashPlayers").querySelectorAll(".clashPlayer").forEach(btn=>{
+    btn.addEventListener("click",()=>selectClashPlayer(btn.dataset.playerId));
+  });
+
+  renderLockSequence();
+}
+
+function selectClashPlayer(id){
+  if(state.currentPlayer || state.clashAnswers[id]!==undefined) return;
+  state.currentPlayer=id;
+  const p=PLAYERS.find(x=>x.id===id);
+  const q=QUESTIONS[state.qIndex];
+  $("selectedPlayerName").textContent=`#${p.id} ${p.name}`;
+  $("selectedPlayerArea").classList.remove("hidden");
+  $("clashAnswerArea").innerHTML=q.opts.map((o,i)=>
+    `<button type="button" class="answer" data-choice="${i}">
+      <span class="letter">${String.fromCharCode(65+i)}</span>${o}
+    </button>`
+  ).join("");
+  document.querySelectorAll("#clashAnswerArea .answer").forEach(btn=>{
+    btn.addEventListener("click",()=>submitClash(id,Number(btn.dataset.choice)));
+  });
+}
+
+function submitClash(id,choice){
+  if(state.currentPlayer!==id || state.clashAnswers[id]!==undefined) return;
+  state.clashTimes[id]=Date.now();
+  state.clashAnswers[id]=choice;
+  state.clashOrder.push(id);
+  state.currentPlayer=null;
+
+  const lockedBtn=$("clashPlayers").querySelector(`[data-player-id="${id}"]`);
+  if(lockedBtn){ lockedBtn.disabled=true; lockedBtn.classList.add("locked"); }
+
+  const p=PLAYERS.find(x=>x.id===id);
+  $("selectedPlayerArea").classList.add("hidden");
+  toast(`#${p.id} ${p.name} LOCKED!`);
+  renderLockSequence();
+
+  const count=state.clashOrder.length;
+  $("clashProgressArea").classList.remove("hidden");
+  $("clashProgressText").textContent=`${count} / 5 LOCKED`;
+
+  if(count===5){
+    $("allLockedArea").classList.remove("hidden");
+    $("revealBtn").classList.remove("hidden");
+    $("revealBtn").disabled=false;
+    toast("FIVE LOCKED — REVEAL READY");
+  }
+}
+
+function revealClash(){
+  if(Object.keys(state.clashAnswers).length!==5){toast(`REVEAL LOCKED — ${Object.keys(state.clashAnswers).length}/5 answers.`);return;}
+  $("clashModal").classList.add("hidden");
+  state.beforeScores={...state.scores};
+  const q=QUESTIONS[state.qIndex], report=[];
+
+  state.clashOrder.forEach((id,idx)=>{
+    const st=state.stats[id],correct=state.clashAnswers[id]===q.a;
+    st.attempts++;
+
+    if(correct){
+      st.correct++; st.streak++; st.bestStreak=Math.max(st.bestStreak,st.streak);
+      const speedBonus=[75,50,30,20,10][idx];
+      let earned=q.value+speedBonus;
+      if(st.streak>=2) earned+=Math.min(60,20*st.streak);
+      state.scores[id]+=earned;
+      if(idx===0) st.clashWins++;
+      report.push({id,idx,correct,earned});
+    }else{
+      st.streak=0;
+      if(q.level==="BOSS BATTLE") state.scores[id]-=100;
+      report.push({id,idx,correct,earned:q.level==="BOSS BATTLE"?-100:0});
+    }
+  });
+
+  state.lastReport=report;
+  renderRanking();
+  renderRanking("lbBig");
+  show("resultScreen");
+  $("resultEyebrow").textContent=q.level;
+  $("resultTitle").textContent="THE REVEAL";
+  $("resultMessage").innerHTML=`<div class="revealStage"><div class="revealAnswer flash"><small>CORRECT ANSWER</small>${String.fromCharCode(65+q.a)}<div style="font:.25em Inter,Arial,sans-serif;color:var(--muted);margin-top:15px">${q.opts[q.a]}</div></div></div>`;
+  $("resultExplanation").innerHTML=`<div class="alert"><b>${q.explain}</b></div><div class="revealGrid">${
+    report.map(r=>{const p=PLAYERS.find(x=>x.id===r.id);return `<div class="revealCard ${r.correct?"good":"bad"}"><b>#${p.id} ${p.name}</b><div class="delta">${r.correct?"✅":"❌"}</div><small>LOCK #${r.idx+1}</small><br><b>${r.earned>0?"+":""}${r.earned}</b></div>`}).join("")
+  }</div>`;
+}
+
+function finishClash(){
+  if(Object.keys(state.clashAnswers).length<5){
+    toast(`Masih ${5-Object.keys(state.clashAnswers).length} pemain yang belum menjawab.`);
+    return;
+  }
+  revealClash();
+}
+
+function findLargestShift(){const rankMap=map=>{const s=[...PLAYERS].sort((a,b)=>map[b.id]-map[a.id]||Number(a.id)-Number(b.id));return Object.fromEntries(s.map((p,i)=>[p.id,i+1]))};const before=rankMap(state.beforeScores),after=rankMap(state.scores);let best=null;PLAYERS.forEach(p=>{const d=before[p.id]-after[p.id];if(!best||d>best.delta)best={id:p.id,before:before[p.id],after:after[p.id],delta:d}});return best&&best.delta>0?best:null}
+function showMoment(s){const p=PLAYERS.find(x=>x.id===s.id);$("momentText").innerHTML=`#${p.id} ${p.name}<br><span style="color:var(--muted)">climbed</span> <b>${s.delta} positions</b> • #${s.before} → #${s.after}`;show("momentScreen")}
+function maybeClassCheck(){const wrong=state.lastReport.filter(r=>!r.correct).length;if(wrong>=2){const q=QUESTIONS[state.qIndex];$("classCheckTitle").textContent=q.level==="TEMPERATURE CLASH"?"THE CLASS IS STRUGGLING WITH ΔT":"CLASS CHECK";$("classCheckText").textContent=q.level==="TEMPERATURE CLASH"?"Banyak jawaban keliru pada ΔT. Ingat: ΔT = Takhir − Tawal, termasuk tanda negatif saat pendinginan.":"Gunakan hasil reveal untuk memeriksa kembali variabel, rumus, dan satuan.";show("classCheckScreen")}}
+function nextQuestion(){if(state.qIndex>=QUESTIONS.length-1){showFinal();return}const prev=QUESTIONS[state.qIndex].level;state.qIndex++;state.poolIndex=(state.poolIndex+1)%5;show("gameScreen");loadQuestion();if(QUESTIONS[state.qIndex].level!==prev)toast(`LEVEL UP: ${QUESTIONS[state.qIndex].level}`)}
+function showFinal(){clearInterval(state.timerId);openAudio();setAudioPhase("boss");const sorted=[...PLAYERS].sort((a,b)=>state.scores[b.id]-state.scores[a.id]||Number(a.id)-Number(b.id)),c=sorted[0],st=state.stats[c.id],acc=st.attempts?Math.round(st.correct/st.attempts*100):0;show("finalScreen");$("championName").textContent=`#${c.id} ${c.name}`;$("finalStats").innerHTML=`<div class="stat"><b>${state.scores[c.id].toLocaleString("id-ID")}</b><span>Total Score</span></div><div class="stat"><b>${acc}%</b><span>Clash Accuracy</span></div><div class="stat"><b>${st.bestStreak}</b><span>Best Streak</span></div><div class="stat"><b>${st.clashWins}</b><span>First Lock Wins</span></div><div class="finalRankGrid">${sorted.slice(0,5).map((p,i)=>`<div class="finalRankItem"><b>${i===0?"🥇":i===1?"🥈":i===2?"🥉":i+1}</b><span>#${p.id} ${p.name}</span><strong>${state.scores[p.id].toLocaleString("id-ID")}</strong></div>`).join("")}</div>`;renderRanking()}
+</script>
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+  const pools=[PLAYERS.slice(0,5),PLAYERS.slice(5,10),PLAYERS.slice(10,15),PLAYERS.slice(15,20),PLAYERS.slice(20,25)];
+  document.getElementById("poolCards").innerHTML=pools.map((pool,i)=>`<div class="card"><small>POOL ${String.fromCharCode(65+i)}</small><strong>${pool.map(p=>p.name).join(", ")}</strong><small>#${pool[0].id}–#${pool[4].id}</small></div>`).join("");
+  init();
+});
+</script>
+</body></html>
